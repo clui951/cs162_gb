@@ -29,13 +29,21 @@ int main(int argc, char *argv[]) {
 
 		while (c != -1) {
 			// printf("%d \n", c);
+			if (c == 12) {
+				// x0c
+				noWordBefore = TRUE;
+				c = getchar();
+				charCount++;
+				continue;
+			}
 			if (c == 0) {
 				// noWordBefore = TRUE;
 				c = getchar();
 				charCount++;
 				continue;
 			}
-			if (c == 13) {
+			if (c == 11) {
+				// x0b
 				noWordBefore = TRUE;
 				c = getchar();
 				charCount++;
