@@ -75,13 +75,21 @@ int main(int argc, char *argv[]) {
 
 
 		while (c != -1) {
-			if (c == 0) {
+			if (c == 12) {
+				// x0c
 				noWordBefore = TRUE;
-				c = getchar();
+				c = fgetc(fp);
 				charCount++;
 				continue;
 			}
-			if (c == 13) {
+			if (c == 0) {
+				// noWordBefore = TRUE;
+				c = fgetc(fp);
+				charCount++;
+				continue;
+			}
+			if (c == 13 || c == 11) {
+				// x0b
 				noWordBefore = TRUE;
 				c = fgetc(fp);
 				charCount++;
