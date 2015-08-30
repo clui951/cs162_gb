@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[]) {
 
-	printf("Personal WC \n");
+	// printf("Personal WC \n");
 
 	int TRUE = 1;
 	int FALSE = 0;
