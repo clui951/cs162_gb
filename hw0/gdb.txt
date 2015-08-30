@@ -1,0 +1,7 @@
+3.3
+
+argv is pointer: (char **) 0x7fffffffe628
+
+argv[0] is the program running: 0x7fffffffe843 "/home/vagrant/code/personal/hw0/wc"
+
+adress of function main is: argv=0x7fffffffe628
