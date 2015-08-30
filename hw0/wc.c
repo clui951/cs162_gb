@@ -28,24 +28,31 @@ int main(int argc, char *argv[]) {
 		c = getchar();
 
 		while (c != -1) {
-		if (c == 10) {
-			// new line character
-			noWordBefore = TRUE;
-			lineCount++;
-		} else {
-			// there is a character (includes spaces)
-			if (c == 32) {
-				// space
+			// printf("%d \n", c);
+			if (c == 13) {
 				noWordBefore = TRUE;
+				c = getchar();
+				charCount++;
+				continue;
+			}
+			if (c == 10 ) {
+				// new line character
+				noWordBefore = TRUE;
+				lineCount++;
 			} else {
-				if (noWordBefore == TRUE) {
-					noWordBefore = FALSE;
-					wordCount++;
+				// there is a character (includes spaces)
+				if (c == 32) {
+					// space
+					noWordBefore = TRUE;
+				} else {
+					if (noWordBefore == TRUE) {
+						noWordBefore = FALSE;
+						wordCount++;
+					}
 				}
 			}
-		}
-		charCount++;
-		c = getchar();
+			charCount++;
+			c = getchar();
 		}
 		printf("%ld %ld %ld \n", lineCount, wordCount, charCount);
 	} else {
@@ -54,6 +61,12 @@ int main(int argc, char *argv[]) {
 
 
 		while (c != -1) {
+			if (c == 13) {
+				noWordBefore = TRUE;
+				c = fgetc(fp);
+				charCount++;
+				continue;
+			}
 			if (c == 10) {
 				// new line character
 				noWordBefore = TRUE;
