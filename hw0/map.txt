@@ -1,0 +1,15 @@
+_main @ 0x4005c2 found in .text
+recur @ 0x40057d found in .text
+static data: 0x601048 found in .text
+
+.init holds process initialization code
+.data holds initialized static variables
+.text contains the actual code
+
+Stack is growing upwards
+
+Each call's stack frame is 0x30 large
+
+Heap is at 0x17ee010, growing upwards
+
+There is extra space between mallocs

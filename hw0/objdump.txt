@@ -1,0 +1,8 @@
+File format elf64-x86-64
+For architecture: i386:x86-64
+
+Segments include: .interp, .init, .plt, .text, .fini, etc.
+
+main is in the section .text
+
+I cannot find the stack is under .data and heap is not found because it has not been allocated with anything yet

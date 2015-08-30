@@ -4,4 +4,11 @@ argv is pointer: (char **) 0x7fffffffe628
 
 argv[0] is the program running: 0x7fffffffe843 "/home/vagrant/code/personal/hw0/wc"
 
-adress of function main is: argv=0x7fffffffe628
+adress of function main is: 0x40065d
+
+info stack gives current process/function that is being executed
+
+info frame gives current information of frame being executed, what came before it, the list of args, etc.
+
+rsi register seems to hold current function (main)
+
