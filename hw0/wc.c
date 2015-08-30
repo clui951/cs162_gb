@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 		while (c != -1) {
 			// printf("%d \n", c);
 			if (c == 0) {
-				noWordBefore = TRUE;
+				// noWordBefore = TRUE;
 				c = getchar();
 				charCount++;
 				continue;
