@@ -29,6 +29,12 @@ int main(int argc, char *argv[]) {
 
 		while (c != -1) {
 			// printf("%d \n", c);
+			if (c == 0) {
+				noWordBefore = TRUE;
+				c = getchar();
+				charCount++;
+				continue;
+			}
 			if (c == 13) {
 				noWordBefore = TRUE;
 				c = getchar();
@@ -61,6 +67,12 @@ int main(int argc, char *argv[]) {
 
 
 		while (c != -1) {
+			if (c == 0) {
+				noWordBefore = TRUE;
+				c = getchar();
+				charCount++;
+				continue;
+			}
 			if (c == 13) {
 				noWordBefore = TRUE;
 				c = fgetc(fp);
