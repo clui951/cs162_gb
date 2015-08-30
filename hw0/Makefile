@@ -1,4 +1,4 @@
-all : clean main
+all : main
 
 main : wc.o
 	gcc -g wc.o -o wc
