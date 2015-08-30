@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 				charCount++;
 				continue;
 			}
-			if (c == 11) {
+			if (c == 13 || c == 11) {
 				// x0b
 				noWordBefore = TRUE;
 				c = getchar();
