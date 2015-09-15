@@ -29,6 +29,8 @@ pid_t shell_pgid;
 
 int cmd_quit(tok_t arg[]);
 int cmd_help(tok_t arg[]);
+int cmd_pwd(tok_t arg[]);
+int cmd_cd(tok_t arg[]);
 
 /* Built-in command functions take token array (see parse.h) and return int */
 typedef int cmd_fun_t(tok_t args[]);
@@ -43,7 +45,31 @@ typedef struct fun_desc {
 fun_desc_t cmd_table[] = {
   {cmd_help, "?", "show this help menu"},
   {cmd_quit, "quit", "quit the command shell"},
+  {cmd_pwd, "pwd", "prints current working directory"},
+  {cmd_cd, "cd", "change to a new working directory"}
 };
+
+/** 
+  * Prints current working directory
+  */
+int cmd_pwd(tok_t arg[]) {
+  char cwdBuffer[1024];
+  if (getcwd(cwdBuffer, sizeof(cwdBuffer)) != NULL ) {
+    fprintf(stdout, "%s\n", cwdBuffer);
+  }
+  return 1;
+}
+
+/**
+  * Change to new working directory
+  */
+int cmd_cd(tok_t arg[]) {
+  // fprintf(stdout, "Trying to cd into: %s\n", arg[0]);
+  if (chdir(arg[0]) == -1) {
+    fprintf(stderr, "cd: %s: No such file or directory\n", arg[0]);
+  }
+  return 1;
+}
 
 /**
  * Prints a helpful description for the given command
