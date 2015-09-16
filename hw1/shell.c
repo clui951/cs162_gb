@@ -144,15 +144,35 @@ int shell(int argc, char *argv[]) {
       if (pid == 0) {
         // THIS IS CHILD PROCESS
         // kick off execution 
-        execv(tokens[0],tokens);
-        // fprintf(stdout, "Child Ran\n");
+        if (execv(tokens[0],tokens) == -1) {
+          // FAIL NORMAL EXECUTION
+          // start using path variables
+
+          // NEED TO PARSE PATH
+          char * pathString = getenv("PATH");
+          char * tokenPath = strtok(pathString, ":");
+          char path[1024];
+          while (tokenPath != NULL) {
+            strcpy(path,tokenPath);
+            strcat(path,"/");
+            strcat(path,tokens[0]);
+
+            if (execv(path,tokens) == -1) {
+              tokenPath = strtok(NULL, ":");
+            } else {
+              break;
+            }
+
+          }
+
+          
+        }
         return 1;
       } else {
         // THIS IS PARENT PROCESS
         // wait for child to finish
         int exitInfo;
         waitpid(pid, &exitInfo , 0);
-        // fprintf(stdout, "Parent Ran\n");
       }
 
       // NEED TO PARSE TOKENS
@@ -169,3 +189,41 @@ int shell(int argc, char *argv[]) {
 
   return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
