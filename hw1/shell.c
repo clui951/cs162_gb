@@ -140,7 +140,26 @@ int shell(int argc, char *argv[]) {
       cmd_table[fundex].fun(&tokens[1]);
     } else {
       /* REPLACE this to run commands as programs. */
-      fprintf(stdout, "This shell doesn't know how to run programs.\n");
+      pid_t pid = fork();
+      if (pid == 0) {
+        // THIS IS CHILD PROCESS
+        // kick off execution 
+        execv(tokens[0],tokens);
+        // fprintf(stdout, "Child Ran\n");
+        return 1;
+      } else {
+        // THIS IS PARENT PROCESS
+        // wait for child to finish
+        int exitInfo;
+        waitpid(pid, &exitInfo , 0);
+        // fprintf(stdout, "Parent Ran\n");
+      }
+
+      // NEED TO PARSE TOKENS
+      // KICK OFF CHILD PROCESS WITH TOKEN[0] PROCESS
+      // ARGS ARE TOKEN[1:]
+      // fprintf(stdout, "WE HAVE GOTTEN FAR\n");
+      // fprintf(stdout, "This shell doesn't know how to run programs.\n");
     }
 
     if (shell_is_interactive)
