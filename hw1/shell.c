@@ -15,6 +15,9 @@
 #include "process.h"
 #include "shell.h"
 
+#include <fcntl.h> // for open
+#include <unistd.h> // for close
+
 /* Whether the shell is connected to an actual terminal or not. */
 bool shell_is_interactive;
 
@@ -140,15 +143,34 @@ int shell(int argc, char *argv[]) {
       cmd_table[fundex].fun(&tokens[1]);
     } else {
       /* REPLACE this to run commands as programs. */
-      pid_t pid = fork();
-      if (pid == 0) {
-        // THIS IS CHILD PROCESS
-        // kick off execution 
-        if (execv(tokens[0],tokens) == -1) {
-          // FAIL NORMAL EXECUTION
-          // start using path variables
 
-          // NEED TO PARSE PATH
+      // fork child process
+      pid_t pid = fork();
+
+      //check if child process
+      if (pid == 0) {
+
+        // handle redirect from stdout to file; >
+        int tokenLen = 0;
+        while (tokens[tokenLen] != NULL ) {
+          tokenLen += 1;
+        }
+        if (tokenLen > 2) {
+          if (strcmp(">",tokens[tokenLen - 2]) == 0) {
+            // do redirect
+            int openInt = open(tokens[tokenLen-1], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+            if (openInt >= 0) {
+              dup2(openInt, 1);
+              close(openInt);
+              tokens[tokenLen -2] = NULL;
+            }
+          } 
+        }
+
+        // try to execute command without path
+        if (execv(tokens[0],tokens) == -1) {
+
+          // search through path string for command resolution
           char * pathString = getenv("PATH");
           char * tokenPath = strtok(pathString, ":");
           char path[1024];
@@ -156,29 +178,23 @@ int shell(int argc, char *argv[]) {
             strcpy(path,tokenPath);
             strcat(path,"/");
             strcat(path,tokens[0]);
-
             if (execv(path,tokens) == -1) {
               tokenPath = strtok(NULL, ":");
             } else {
               break;
             }
-
           }
-
-          
         }
+
+        // end of child process
         return 1;
+
       } else {
-        // THIS IS PARENT PROCESS
-        // wait for child to finish
+        // parent process wait for child to finish
         int exitInfo;
         waitpid(pid, &exitInfo , 0);
       }
 
-      // NEED TO PARSE TOKENS
-      // KICK OFF CHILD PROCESS WITH TOKEN[0] PROCESS
-      // ARGS ARE TOKEN[1:]
-      // fprintf(stdout, "WE HAVE GOTTEN FAR\n");
       // fprintf(stdout, "This shell doesn't know how to run programs.\n");
     }
 
