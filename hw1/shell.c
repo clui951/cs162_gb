@@ -150,7 +150,7 @@ int shell(int argc, char *argv[]) {
       //check if child process
       if (pid == 0) {
 
-        // handle redirect from stdout to file; >
+        // handle stdin/stdout redirect; </>
         int tokenLen = 0;
         while (tokens[tokenLen] != NULL ) {
           tokenLen += 1;
@@ -161,6 +161,14 @@ int shell(int argc, char *argv[]) {
             int openInt = open(tokens[tokenLen-1], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
             if (openInt >= 0) {
               dup2(openInt, 1);
+              close(openInt);
+              tokens[tokenLen -2] = NULL;
+            }
+          } else if (strcmp("<",tokens[tokenLen - 2]) == 0) {
+            // do redirect
+            int openInt = open(tokens[tokenLen-1], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+            if (openInt >= 0) {
+              dup2(openInt, 0);
               close(openInt);
               tokens[tokenLen -2] = NULL;
             }
