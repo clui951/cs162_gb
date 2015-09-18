@@ -121,6 +121,12 @@ void init_shell() {
     /* Take control of the terminal */
     tcsetpgrp(shell_terminal, shell_pgid);
     tcgetattr(shell_terminal, &shell_tmodes);
+
+    // Ignore certain errors
+    signal(SIGINT, SIG_IGN);
+    // signal(SIGTSTP, SIG_IGN);
+    // signal(SIGQUIT, SIG_IGN);
+
   }
 }
 
@@ -152,6 +158,7 @@ int shell(int argc, char *argv[]) {
 
         // put child process on foreground
         tcsetpgrp(shell_terminal , pid);
+        setpgid(pid, getpgrp() + 1);
 
         // handle stdin/stdout redirect; </>
         int tokenLen = 0;
