@@ -123,9 +123,12 @@ void init_shell() {
     tcgetattr(shell_terminal, &shell_tmodes);
 
     // Ignore certain errors
-    signal(SIGINT, SIG_IGN);
-    // signal(SIGTSTP, SIG_IGN);
-    // signal(SIGQUIT, SIG_IGN);
+    signal (SIGINT, SIG_IGN);
+    signal (SIGQUIT, SIG_IGN);
+    signal (SIGTSTP, SIG_IGN);
+    signal (SIGTTIN, SIG_IGN);
+    signal (SIGTTOU, SIG_IGN);
+    signal (SIGCHLD, SIG_IGN);
 
   }
 }
@@ -158,9 +161,12 @@ int shell(int argc, char *argv[]) {
 
         // put child process on foreground
         tcsetpgrp(shell_terminal , pid);
-        signal(SIGINT, SIG_DFL);
-        // signal(SIGTSTP, SIG_DFL);
-        // signal(SIGQUIT, SIG_DFL);
+        signal (SIGINT, SIG_DFL);
+        signal (SIGQUIT, SIG_DFL);
+        signal (SIGTSTP, SIG_DFL);
+        signal (SIGTTIN, SIG_DFL);
+        signal (SIGTTOU, SIG_DFL);
+        signal (SIGCHLD, SIG_DFL);
 
 
         // handle stdin/stdout redirect; </>
