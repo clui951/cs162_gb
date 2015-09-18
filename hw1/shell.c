@@ -150,6 +150,9 @@ int shell(int argc, char *argv[]) {
       //check if child process
       if (pid == 0) {
 
+        // put child process on foreground
+        tcsetpgrp(shell_terminal , pid);
+
         // handle stdin/stdout redirect; </>
         int tokenLen = 0;
         while (tokens[tokenLen] != NULL ) {
@@ -201,6 +204,7 @@ int shell(int argc, char *argv[]) {
         // parent process wait for child to finish
         int exitInfo;
         waitpid(pid, &exitInfo , 0);
+        tcsetpgrp(shell_terminal, getpid());
       }
 
       // fprintf(stdout, "This shell doesn't know how to run programs.\n");
