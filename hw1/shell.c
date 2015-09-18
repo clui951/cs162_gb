@@ -128,7 +128,6 @@ void init_shell() {
     signal (SIGTSTP, SIG_IGN);
     signal (SIGTTIN, SIG_IGN);
     signal (SIGTTOU, SIG_IGN);
-    signal (SIGCHLD, SIG_IGN);
 
   }
 }
@@ -166,7 +165,6 @@ int shell(int argc, char *argv[]) {
         signal (SIGTSTP, SIG_DFL);
         signal (SIGTTIN, SIG_DFL);
         signal (SIGTTOU, SIG_DFL);
-        signal (SIGCHLD, SIG_DFL);
 
 
         // handle stdin/stdout redirect; </>
