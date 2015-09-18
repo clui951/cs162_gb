@@ -158,7 +158,10 @@ int shell(int argc, char *argv[]) {
 
         // put child process on foreground
         tcsetpgrp(shell_terminal , pid);
-        setpgid(pid, getpgrp() + 1);
+        signal(SIGINT, SIG_DFL);
+        // signal(SIGTSTP, SIG_DFL);
+        // signal(SIGQUIT, SIG_DFL);
+
 
         // handle stdin/stdout redirect; </>
         int tokenLen = 0;
