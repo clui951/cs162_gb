@@ -171,10 +171,6 @@ int shell(int argc, char *argv[]) {
       //check if child process
       if (pid == 0) {
 
-        if (inBackground) {
-          put_process_in_background(pid, true);
-          tokens[tokenLen - 1] = NULL;
-        } 
         // put child process on foreground
         // tcsetpgrp(shell_terminal , pid);
         signal (SIGINT, SIG_DFL);
@@ -209,6 +205,11 @@ int shell(int argc, char *argv[]) {
           } 
         }
 
+        if (inBackground) {
+          put_process_in_background(pid, true);
+          tokens[tokenLen - 1] = NULL;
+        } 
+
         // try to execute command without path
         if (execv(tokens[0],tokens) == -1) {
 
@@ -236,8 +237,8 @@ int shell(int argc, char *argv[]) {
         wait(&pid);
         int exitInfo;
         // waitpid(pid, &exitInfo , 0);
-        // tcsetpgrp(shell_terminal, getpid());
-        put_process_in_foreground(shell_terminal, getpid(), &shell_tmodes);
+        tcsetpgrp(shell_terminal, getpid());
+        // put_process_in_foreground(shell_terminal, getpid(), &shell_tmodes);
       }
 
       // fprintf(stdout, "This shell doesn't know how to run programs.\n");
