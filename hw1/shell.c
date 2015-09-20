@@ -162,7 +162,7 @@ int shell(int argc, char *argv[]) {
         tokenLen += 1;
       }
       if (tokenLen >= 2) {
-        if (strcmp("&",tokens[tokenLen -1])) {
+        if (strcmp("&",tokens[tokenLen -1]) == 0) {
           inBackground = true;
           // tokens[tokenLen - 1] = NULL;
         }
