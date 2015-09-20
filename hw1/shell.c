@@ -235,7 +235,8 @@ int shell(int argc, char *argv[]) {
         wait(&pid);
         int exitInfo;
         // waitpid(pid, &exitInfo , 0);
-        tcsetpgrp(shell_terminal, getpid());
+        // tcsetpgrp(shell_terminal, getpid());
+        put_process_in_foreground(shell_terminal, getpid());
       }
 
       // fprintf(stdout, "This shell doesn't know how to run programs.\n");
