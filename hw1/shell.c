@@ -161,12 +161,13 @@ int shell(int argc, char *argv[]) {
       while (tokens[tokenLen] != NULL ) {
         tokenLen += 1;
       }
-      // if (tokenLen >= 2) {
-      //   if (strcmp("&",tokens[tokenLen -1])) {
-      //     inBackground = true;
-      //     tokens[tokenLen - 1] = NULL;
-      //   }
-      // }
+      if (tokenLen >= 2) {
+        if (strcmp("&",tokens[tokenLen -1])) {
+          inBackground = true;
+          tokens[tokenLen - 1] = NULL;
+          tokenLen = tokenLen-1;
+        }
+      }
 
       //check if child process
       if (pid == 0) {
