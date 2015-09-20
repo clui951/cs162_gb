@@ -234,8 +234,9 @@ int shell(int argc, char *argv[]) {
 
       } else {
         // parent process wait for child to finish
-        wait(&pid);
-        int exitInfo;
+        if (!inBackground) {
+          wait(&pid);
+        }
         // waitpid(pid, &exitInfo , 0);
         tcsetpgrp(shell_terminal, getpid());
         // put_process_in_foreground(shell_terminal, getpid(), &shell_tmodes);
