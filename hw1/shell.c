@@ -156,17 +156,17 @@ int shell(int argc, char *argv[]) {
       pid_t pid = fork();
 
       // check if process should be background
-      int tokenLen = 0;
-      bool inBackground = false;
-      while (tokens[tokenLen] != NULL ) {
-        tokenLen += 1;
-      }
-      if (tokenLen >= 2) {
-        if (strcmp("&",tokens[tokenLen -1])) {
-          inBackground = true;
-          tokens[tokenLen - 1] = NULL;
-        }
-      }
+      // int tokenLen = 0;
+      // bool inBackground = false;
+      // while (tokens[tokenLen] != NULL ) {
+      //   tokenLen += 1;
+      // }
+      // if (tokenLen >= 2) {
+      //   if (strcmp("&",tokens[tokenLen -1])) {
+      //     inBackground = true;
+      //     tokens[tokenLen - 1] = NULL;
+      //   }
+      // }
 
       //check if child process
       if (pid == 0) {
