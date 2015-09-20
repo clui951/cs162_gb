@@ -171,11 +171,11 @@ int shell(int argc, char *argv[]) {
       //check if child process
       if (pid == 0) {
 
-        // if (inBackground) {
-        //   put_process_in_background(pid, true);
-        // } else {
-        //   wait(&pid);
-        // }
+        if (inBackground) {
+          put_process_in_background(pid, true);
+        } else {
+          wait(&pid);
+        }
         // put child process on foreground
         tcsetpgrp(shell_terminal , pid);
         signal (SIGINT, SIG_DFL);
