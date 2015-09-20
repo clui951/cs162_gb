@@ -155,11 +155,29 @@ int shell(int argc, char *argv[]) {
       // fork child process
       pid_t pid = fork();
 
+      // check if process should be background
+      int tokenLen = 0;
+      bool inBackground = false;
+      while (tokens[tokenLen] != NULL ) {
+        tokenLen += 1;
+      }
+      if (tokenLen >= 2) {
+        if (strcmp("&",tokens[tokenLen -1])) {
+          inBackground = true;
+          tokens[tokenLen - 1] = NULL;
+        }
+      }
+
       //check if child process
       if (pid == 0) {
 
+        if (inBackground) {
+          put_process_in_background(pid, true);
+        } else {
+          wait(&pid);
+        }
         // put child process on foreground
-        tcsetpgrp(shell_terminal , pid);
+        // tcsetpgrp(shell_terminal , pid);
         signal (SIGINT, SIG_DFL);
         signal (SIGQUIT, SIG_DFL);
         signal (SIGTSTP, SIG_DFL);
@@ -168,7 +186,7 @@ int shell(int argc, char *argv[]) {
 
 
         // handle stdin/stdout redirect; </>
-        int tokenLen = 0;
+        tokenLen = 0;
         while (tokens[tokenLen] != NULL ) {
           tokenLen += 1;
         }
