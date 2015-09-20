@@ -230,7 +230,6 @@ int shell(int argc, char *argv[]) {
       } else {
         // parent process wait for child to finish
         if (!inBackground) {
-          printf("HEHEHEHEHEHEHEEHEHEHE");
           wait(&pid);
         }
         // waitpid(pid, &exitInfo , 0);
