@@ -177,7 +177,7 @@ int shell(int argc, char *argv[]) {
           wait(&pid);
         }
         // put child process on foreground
-        tcsetpgrp(shell_terminal , pid);
+        // tcsetpgrp(shell_terminal , pid);
         signal (SIGINT, SIG_DFL);
         signal (SIGQUIT, SIG_DFL);
         signal (SIGTSTP, SIG_DFL);
