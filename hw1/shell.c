@@ -173,6 +173,7 @@ int shell(int argc, char *argv[]) {
 
         if (inBackground) {
           put_process_in_background(pid, true);
+          tokens[tokenLen - 1] = NULL;
         } 
         // put child process on foreground
         // tcsetpgrp(shell_terminal , pid);
@@ -236,7 +237,7 @@ int shell(int argc, char *argv[]) {
         int exitInfo;
         // waitpid(pid, &exitInfo , 0);
         // tcsetpgrp(shell_terminal, getpid());
-        put_process_in_foreground(shell_terminal, getpid(), shell_tmodes);
+        put_process_in_foreground(shell_terminal, getpid(), &shell_tmodes);
       }
 
       // fprintf(stdout, "This shell doesn't know how to run programs.\n");
