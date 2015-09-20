@@ -157,10 +157,10 @@ int shell(int argc, char *argv[]) {
 
       // check if process should be background
       int tokenLen = 0;
-      // bool inBackground = false;
-      // while (tokens[tokenLen] != NULL ) {
-      //   tokenLen += 1;
-      // }
+      bool inBackground = false;
+      while (tokens[tokenLen] != NULL ) {
+        tokenLen += 1;
+      }
       // if (tokenLen >= 2) {
       //   if (strcmp("&",tokens[tokenLen -1])) {
       //     inBackground = true;
@@ -186,10 +186,10 @@ int shell(int argc, char *argv[]) {
 
 
         // handle stdin/stdout redirect; </>
-        tokenLen = 0;
-        while (tokens[tokenLen] != NULL ) {
-          tokenLen += 1;
-        }
+        // tokenLen = 0;
+        // while (tokens[tokenLen] != NULL ) {
+        //   tokenLen += 1;
+        // }
         if (tokenLen > 2) {
           if (strcmp(">",tokens[tokenLen - 2]) == 0) {
             // do redirect
