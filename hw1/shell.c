@@ -232,9 +232,9 @@ int shell(int argc, char *argv[]) {
 
       } else {
         // parent process wait for child to finish
-        wait(&pid)
+        wait(&pid);
         int exitInfo;
-        waitpid(pid, &exitInfo , 0);
+        // waitpid(pid, &exitInfo , 0);
         tcsetpgrp(shell_terminal, getpid());
       }
 
