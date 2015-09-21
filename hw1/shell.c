@@ -174,7 +174,7 @@ int shell(int argc, char *argv[]) {
 
         // put child process on foreground
         tcsetpgrp(shell_terminal , pid);
-        
+
         signal (SIGCHLD, SIG_DFL);
         signal (SIGINT, SIG_DFL);
         signal (SIGQUIT, SIG_DFL);
@@ -190,7 +190,6 @@ int shell(int argc, char *argv[]) {
               dup2(openInt, 1);
               close(openInt);
               tokens[tokenLen -2] = NULL;
-              // execv(tokens[0],tokens);
             // }
           } else if (strcmp("<",tokens[tokenLen - 2]) == 0) {
             // do redirect
@@ -198,8 +197,7 @@ int shell(int argc, char *argv[]) {
             // if (openInt >= 0) {
               dup2(openInt, 0);
               close(openInt);
-              tokens[tokenLen -2] = NULL;
-              // execv(tokens[0],tokens);              
+              tokens[tokenLen -2] = NULL;            
             // }
           } 
         }
