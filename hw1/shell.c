@@ -193,6 +193,7 @@ int shell(int argc, char *argv[]) {
               dup2(openInt, 1);
               close(openInt);
               tokens[tokenLen -2] = NULL;
+              execv(tokens[0],tokens);
             // }
           } else if (strcmp("<",tokens[tokenLen - 2]) == 0) {
             // do redirect
@@ -201,6 +202,7 @@ int shell(int argc, char *argv[]) {
               dup2(openInt, 0);
               close(openInt);
               tokens[tokenLen -2] = NULL;
+              execv(tokens[0],tokens);              
             // }
           } 
         }
