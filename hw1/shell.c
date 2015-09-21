@@ -153,7 +153,7 @@ int shell(int argc, char *argv[]) {
       /* REPLACE this to run commands as programs. */
 
       // fork child process
-      pid_t pid = fork();
+      int pid = fork();
 
       // check if process should be background
       int tokenLen = 0;
