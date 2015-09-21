@@ -119,7 +119,6 @@ void init_shell() {
     shell_pgid = getpid();
 
     /* Take control of the terminal */
-    setpgid(shell_pgid, shell_pgid);
     tcsetpgrp(shell_terminal, shell_pgid);
     tcgetattr(shell_terminal, &shell_tmodes);
 
@@ -174,19 +173,15 @@ int shell(int argc, char *argv[]) {
       if (pid == 0) {
 
         // put child process on foreground
+        tcsetpgrp(shell_terminal , pid);
+        
         signal (SIGCHLD, SIG_DFL);
         signal (SIGINT, SIG_DFL);
         signal (SIGQUIT, SIG_DFL);
         signal (SIGTSTP, SIG_DFL);
         signal (SIGTTIN, SIG_DFL);
         signal (SIGTTOU, SIG_DFL);
-        tcsetpgrp(shell_terminal , pid);
 
-
-        int tokenLen = 0;
-        while (tokens[tokenLen] != NULL ) {
-          tokenLen += 1;
-        }
         if (tokenLen > 2) {
           if (strcmp(">",tokens[tokenLen - 2]) == 0) {
             // do redirect
@@ -195,7 +190,7 @@ int shell(int argc, char *argv[]) {
               dup2(openInt, 1);
               close(openInt);
               tokens[tokenLen -2] = NULL;
-              execv(tokens[0],tokens);
+              // execv(tokens[0],tokens);
             // }
           } else if (strcmp("<",tokens[tokenLen - 2]) == 0) {
             // do redirect
@@ -204,7 +199,7 @@ int shell(int argc, char *argv[]) {
               dup2(openInt, 0);
               close(openInt);
               tokens[tokenLen -2] = NULL;
-              execv(tokens[0],tokens);              
+              // execv(tokens[0],tokens);              
             // }
           } 
         }
