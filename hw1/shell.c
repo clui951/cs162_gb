@@ -129,6 +129,7 @@ void init_shell() {
     signal (SIGTTIN, SIG_IGN);
     signal (SIGTTOU, SIG_IGN);
 
+    setpgid(shell_pgid, shell_pgid);
   }
 }
 
