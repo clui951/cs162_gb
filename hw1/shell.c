@@ -119,14 +119,13 @@ void init_shell() {
     shell_pgid = getpid();
 
     /* Take control of the terminal */
+    setpgid(shell_pgid, shell_pgid);
     tcsetpgrp(shell_terminal, shell_pgid);
     tcgetattr(shell_terminal, &shell_tmodes);
 
-
-
-    setpgid(shell_pgid, shell_pgid);
   }
   // Ignore certain errors
+  signal (SIGCHLD, SIG_IGN);
   signal (SIGINT, SIG_IGN);
   signal (SIGQUIT, SIG_IGN);
   signal (SIGTSTP, SIG_IGN);
@@ -163,6 +162,7 @@ int shell(int argc, char *argv[]) {
       while (tokens[tokenLen] != NULL ) {
         tokenLen += 1;
       }
+
       if (tokenLen >= 2) {
         if (strcmp("&",tokens[tokenLen -1]) == 0) {
           inBackground = true;
@@ -174,15 +174,16 @@ int shell(int argc, char *argv[]) {
       if (pid == 0) {
 
         // put child process on foreground
-        tcsetpgrp(shell_terminal , pid);
+        signal (SIGCHLD, SIG_DFL);
         signal (SIGINT, SIG_DFL);
         signal (SIGQUIT, SIG_DFL);
         signal (SIGTSTP, SIG_DFL);
         signal (SIGTTIN, SIG_DFL);
         signal (SIGTTOU, SIG_DFL);
+        tcsetpgrp(shell_terminal , pid);
+
 
         int tokenLen = 0;
-        bool inBackground = false;
         while (tokens[tokenLen] != NULL ) {
           tokenLen += 1;
         }
