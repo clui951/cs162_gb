@@ -122,15 +122,16 @@ void init_shell() {
     tcsetpgrp(shell_terminal, shell_pgid);
     tcgetattr(shell_terminal, &shell_tmodes);
 
-    // Ignore certain errors
-    signal (SIGINT, SIG_IGN);
-    signal (SIGQUIT, SIG_IGN);
-    signal (SIGTSTP, SIG_IGN);
-    signal (SIGTTIN, SIG_IGN);
-    signal (SIGTTOU, SIG_IGN);
+
 
     setpgid(shell_pgid, shell_pgid);
   }
+  // Ignore certain errors
+  signal (SIGINT, SIG_IGN);
+  signal (SIGQUIT, SIG_IGN);
+  signal (SIGTSTP, SIG_IGN);
+  signal (SIGTTIN, SIG_IGN);
+  signal (SIGTTOU, SIG_IGN);
 }
 
 int shell(int argc, char *argv[]) {
