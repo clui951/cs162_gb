@@ -184,19 +184,19 @@ int shell(int argc, char *argv[]) {
           if (strcmp(">",tokens[tokenLen - 2]) == 0) {
             // do redirect
             int openInt = open(tokens[tokenLen-1], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-            if (openInt >= 0) {
+            // if (openInt >= 0) {
               dup2(openInt, 1);
               close(openInt);
               tokens[tokenLen -2] = NULL;
-            }
+            // }
           } else if (strcmp("<",tokens[tokenLen - 2]) == 0) {
             // do redirect
             int openInt = open(tokens[tokenLen-1], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-            if (openInt >= 0) {
+            // if (openInt >= 0) {
               dup2(openInt, 0);
               close(openInt);
               tokens[tokenLen -2] = NULL;
-            }
+            // }
           } 
         }
 
