@@ -180,7 +180,11 @@ int shell(int argc, char *argv[]) {
         signal (SIGTTIN, SIG_DFL);
         signal (SIGTTOU, SIG_DFL);
 
-
+        int tokenLen = 0;
+        bool inBackground = false;
+        while (tokens[tokenLen] != NULL ) {
+          tokenLen += 1;
+        }
         if (tokenLen > 2) {
           if (strcmp(">",tokens[tokenLen - 2]) == 0) {
             // do redirect
