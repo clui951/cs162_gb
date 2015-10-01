@@ -95,8 +95,6 @@ void handle_files_request(int fd) {
       // send back index.html
       http_start_response(fd,200);
       http_send_header(fd, "Content-type", "text/html");
-      http_send_header(fd, "Content-length", "1024");
-      http_end_headers(fd);
       // open index.html to char
       FILE *fp = fopen ( full_path , "rb" );
       fseek( fp , 0L , SEEK_END);
@@ -105,6 +103,8 @@ void handle_files_request(int fd) {
       char *buffer = (char*) malloc(lSize+1 );
       fread( buffer , lSize, 1 , fp);
       fclose(fp);
+      http_send_header(fd, "Content-length", (char*) strlen(buffer));
+      http_end_headers(fd);
       http_send_string(fd,buffer);
     } else {
       // send back all files 
