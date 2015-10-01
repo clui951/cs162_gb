@@ -103,7 +103,8 @@ void handle_files_request(int fd) {
       char *buffer = (char*) malloc(lSize+1 );
       fread( buffer , lSize, 1 , fp);
       fclose(fp);
-      http_send_header(fd, "Content-length", (char*) strlen(buffer));
+      // http_send_header(fd, "Content-length", (char*) strlen(buffer));
+      http_send_header(fd, "Content-length", "70");
       http_end_headers(fd);
       http_send_string(fd,buffer);
     } else {
