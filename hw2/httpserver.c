@@ -95,6 +95,7 @@ void handle_files_request(int fd) {
       // send back index.html
       http_start_response(fd,200);
       http_send_header(fd, "Content-type", "text/html");
+      http_send_header(fd, "Content-length", "1024");
       http_end_headers(fd);
       // open index.html to char
       FILE *fp = fopen ( full_path , "rb" );
@@ -109,6 +110,7 @@ void handle_files_request(int fd) {
       // send back all files 
       http_start_response(fd,200);
       http_send_header(fd, "Content-type", "text/html");
+      http_send_header(fd, "Content-length", "1024");
       http_end_headers(fd);
       http_send_string(fd,retvalue);
       printf("RETURN VALUE IS %s\n", retvalue);
@@ -118,6 +120,7 @@ void handle_files_request(int fd) {
     printf("THIS IS A FILE \n");
     http_start_response(fd,200);
     http_send_header(fd, "Content-type", http_get_mime_type(full_path));
+    http_send_header(fd, "Content-length", "1024");
     http_end_headers(fd);
     // TODO: need to send the pic / file / whatever
     // http_send_string(fd, SEND_SHIT_HERE);
@@ -135,6 +138,7 @@ void handle_files_request(int fd) {
     printf("NEITHER A DIR OR FILE \n");
     http_start_response(fd,404);
     http_send_header(fd, "Content-type", "text/html");
+    http_send_header(fd, "Content-length", "1024");
     http_end_headers(fd);
     http_send_string(fd,
       "<center>"
