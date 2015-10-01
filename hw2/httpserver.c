@@ -28,6 +28,9 @@ char *server_files_directory;
 char *server_proxy_hostname;
 int server_proxy_port;
 
+
+void send_dummy_landing(int fd);
+
 /*
  * Reads an HTTP request from stream (fd), and writes an HTTP response
  * containing:
@@ -44,17 +47,117 @@ void handle_files_request(int fd) {
   /* YOUR CODE HERE (Feel free to delete/modify the existing code below) */
 
   struct http_request *request = http_request_parse(fd);
+  printf("\n-- handle_files_request called --\n"); // test
+  // printf("%s\n" , request->path); // path to append to working directory, or / if root
+  // printf("%s\n", server_files_directory); // current working directory
 
+  // create append working directory and request path
+  // char *full_path = (char *) malloc(strlen(request->path)+strlen(server_files_directory)+1);
+  char *full_path = strcat(server_files_directory, request->path);
+  // full_path[0] = '\0';   // ensures the memory is an empty string
+  // strcat(full_path,server_files_directory);
+  // strcat(full_path,request->path);
+  printf("full_path: %s\n",full_path);
+
+  // determine if directory or file
+  struct stat path_stat;
+  stat(full_path, &path_stat);
+  if (S_ISDIR(path_stat.st_mode)) {
+    printf("THIS IS A DIRECTORY \n");
+    
+    // look up things in directory
+    DIR *dir;
+    struct dirent *ent;
+    char retvalue[1024] = "";
+    if ((dir = opendir (full_path)) != NULL) {
+      ent = readdir(dir);
+      while (ent != NULL) {
+        // printf("%s %s\n", "element is: ", ent->d_name );
+        strcat(retvalue, "<a href=\"");
+        strcat(retvalue, request->path);
+        strcat(retvalue, "/");
+        strcat(retvalue, ent->d_name);
+        strcat(retvalue, "\">");
+        strcat(retvalue, ent->d_name);
+        strcat(retvalue, "</a>");
+        strcat(retvalue, "<p>");
+        ent = readdir(dir);
+      }
+      printf("FINAL: %s\n", retvalue);
+      closedir (dir);
+    }
+
+    // check for index.html
+    strcat(full_path,"/index.html");
+    struct stat full_path_stat;
+    stat(full_path, &full_path_stat);
+    if (S_ISREG(full_path_stat.st_mode)) {
+      // send back index.html
+      http_start_response(fd,200);
+      http_send_header(fd, "Content-type", "text/html");
+      http_end_headers(fd);
+      // open index.html to char
+      FILE *fp = fopen ( full_path , "rb" );
+      fseek( fp , 0L , SEEK_END);
+      long lSize = ftell( fp );
+      rewind( fp );
+      char *buffer = (char*) malloc(lSize+1 );
+      fread( buffer , lSize, 1 , fp);
+      fclose(fp);
+      http_send_string(fd,buffer);
+    } else {
+      // send back all files 
+      http_start_response(fd,200);
+      http_send_header(fd, "Content-type", "text/html");
+      http_end_headers(fd);
+      http_send_string(fd,retvalue);
+      printf("RETURN VALUE IS %s\n", retvalue);
+    }
+
+  } else if (S_ISREG(path_stat.st_mode)) {
+    printf("THIS IS A FILE \n");
+    http_start_response(fd,200);
+    http_send_header(fd, "Content-type", http_get_mime_type(full_path));
+    http_end_headers(fd);
+    // TODO: need to send the pic / file / whatever
+    // http_send_string(fd, SEND_SHIT_HERE);
+    FILE *fp = fopen ( full_path , "rb" );
+    fseek(fp, 0, SEEK_END);
+    long fsize = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    char *string = (char*) malloc(fsize + 1);
+    fread(string, fsize, 1, fp);
+    fclose(fp);
+    string[fsize] = 0;
+    http_send_string(fd, string);
+
+  } else {
+    printf("NEITHER A DIR OR FILE \n");
+    http_start_response(fd,404);
+    http_send_header(fd, "Content-type", "text/html");
+    http_end_headers(fd);
+    http_send_string(fd,
+      "<center>"
+      "<h1>ERROR 404, NOT FOUND</h1>"
+      "<hr>"
+      "<p>This is a custom page</p>"
+      "</center>");
+  }
+
+}
+
+
+
+void send_dummy_landing(int fd) {
   http_start_response(fd, 200);
   http_send_header(fd, "Content-type", "text/html");
   http_end_headers(fd);
   http_send_string(fd,
       "<center>"
-      "<h1>Welcome to httpserver!</h1>"
+      "<h1>DUMMY LANDING httpserver!</h1>"
       "<hr>"
-      "<p>Nothing's here yet.</p>"
+      "<p>DUMMY LANDING PAGEt.</p>"
       "</center>");
-
 }
 
 /*
