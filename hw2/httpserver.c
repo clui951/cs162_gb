@@ -143,7 +143,10 @@ void handle_files_request(int fd) {
     fread(string, fsize, 1, fp);
     fclose(fp);
     string[fsize] = 0;
-    http_send_header(fd, "Content-length", (char*) strlen(string));
+    size_t string_size = strlen(string);
+    char str[256] = "";
+    snprintf(str, sizeof(str), "%zu", string_size);
+    http_send_header(fd, "Content-length", str);
     http_end_headers(fd);
     http_send_string(fd, string);
 
