@@ -204,7 +204,8 @@ void handle_proxy_request(int fd) {
   FD_SET(socket_number, &fd1);
   FD_SET(fd, &fd1);
   char bufferr[9999];
-  while (true) {
+  int run = 1;
+  while (run) {
     fd2 = fd1;
     int ret = select(FD_SETSIZE,&fd2,NULL,NULL,NULL);
     if ( ret != 0 && FD_ISSET(socket_number, &fd2)) {
@@ -212,20 +213,24 @@ void handle_proxy_request(int fd) {
       if (ret1 > 0) {
         ret1 = write(fd, bufferr, ret1);
         if (ret1 > 0) {
-          break;
+          run = 0;
+          continue;
         }
       } else {
-        break;
+        run = 0;
+        continue;
       }
     } else if ( ret!= 0 && FD_ISSET(fd, &fd2)) {
       int ret1 = read(fd, bufferr, sizeof(bufferr));
       if (ret1 > 0) {
         ret1 = write(socket_number, bufferr, ret1);
         if (ret1 > 0) {
-          break;
+          run = 0;
+          continue;
         }
       } else {
-        break;
+        run = 0;
+        continue;
       }
     }
   }
