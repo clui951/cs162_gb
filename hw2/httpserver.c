@@ -140,17 +140,17 @@ void handle_files_request(int fd) {
     long fsize = ftell(fp);
     fseek(fp, 0, SEEK_SET);
     char *string = (char*) malloc(fsize + 1);
-    fread(string, fsize, 1, fp);
+    size_t rett = fread(string, fsize, 1, fp);
     fclose(fp);
     string[fsize] = 0;
 
     // incorrect if string has null bytes
-    size_t string_size = strlen(string);
+    size_t string_size = rett;
     char str[256] = "";
     snprintf(str, sizeof(str), "%zu", string_size);
     http_send_header(fd, "Content-length", str); // content length wrong
     http_end_headers(fd);
-    http_send_string(fd, string);
+    http_send_data(fd, string, rett);
 
   } else {
     printf("NEITHER A DIR OR FILE \n");
