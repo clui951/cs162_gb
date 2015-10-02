@@ -143,12 +143,14 @@ void handle_files_request(int fd) {
     fread(string, fsize, 1, fp);
     fclose(fp);
     string[fsize] = 0;
-    size_t string_size = sizeof(*string);
+
+    // incorrect if string has null bytes
+    size_t string_size = strlen(string);
     char str[256] = "";
     snprintf(str, sizeof(str), "%zu", string_size);
     http_send_header(fd, "Content-length", str);
     http_end_headers(fd);
-    http_send_string(fd, string);
+    http_send_data(fd, string, string_size);
 
   } else {
     printf("NEITHER A DIR OR FILE \n");
