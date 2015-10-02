@@ -154,7 +154,7 @@ void handle_files_request(int fd) {
     printf("NEITHER A DIR OR FILE \n");
     http_start_response(fd,404);
     http_send_header(fd, "Content-type", "text/html");
-    http_send_header(fd, "Content-length", "1024");
+    // http_send_header(fd, "Content-length", "1024");
     http_end_headers(fd);
     http_send_string(fd,
       "<center>"
@@ -162,6 +162,7 @@ void handle_files_request(int fd) {
       "<hr>"
       "<p>This is a custom page</p>"
       "</center>");
+    printf("HEREHERHEHRE");
   }
 
 }
