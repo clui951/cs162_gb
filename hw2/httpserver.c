@@ -74,6 +74,7 @@ void handle_files_request(int fd) {
       while (ent != NULL) {
         // printf("%s %s\n", "element is: ", ent->d_name );
         strcat(retvalue, "<a href=\"");
+        strcat(retvalue, full_path);
         strcat(retvalue, request->path);
         strcat(retvalue, "/");
         strcat(retvalue, ent->d_name);
