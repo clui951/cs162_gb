@@ -71,6 +71,18 @@ void handle_files_request(int fd) {
 void handle_proxy_request(int fd) {
 
   /* YOUR CODE HERE */
+  struct hostent* host_hostent = gethostbyname(server_proxy_hostname);
+  char * found_addr = host_hostent->h_addr;
+
+  struct sockaddr_in server_address;
+  memset(&server_address, 0, sizeof(server_address));
+  server_address.sin_family = AF_INET;
+  server_address.sin_addr.s_addr = INADDR_ANY;
+  server_address.sin_port = htons(server_proxy_port);
+
+  int socket_number = socket(PF_INET, SOCK_STREAM, 0);
+
+  connect(socket_number, (struct sockaddr *) &found_addr, sizeof(found_addr));
 
 }
 
