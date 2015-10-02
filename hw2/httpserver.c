@@ -121,7 +121,6 @@ void handle_files_request(int fd) {
     printf("THIS IS A FILE \n");
     http_start_response(fd,200);
     http_send_header(fd, "Content-type", http_get_mime_type(full_path));
-    http_send_header(fd, "Content-length", "1024");
     http_end_headers(fd);
     // TODO: need to send the pic / file / whatever
     // http_send_string(fd, SEND_SHIT_HERE);
@@ -133,6 +132,7 @@ void handle_files_request(int fd) {
     fread(string, fsize, 1, fp);
     fclose(fp);
     string[fsize] = 0;
+    http_send_header(fd, "Content-length", (char*) strlen(string));
     http_send_string(fd, string);
 
   } else {
