@@ -15,6 +15,9 @@
 #include "process.h"
 #include "shell.h"
 
+#include <fcntl.h> // for open
+#include <unistd.h> // for close
+
 /* Whether the shell is connected to an actual terminal or not. */
 bool shell_is_interactive;
 
@@ -29,6 +32,8 @@ pid_t shell_pgid;
 
 int cmd_quit(tok_t arg[]);
 int cmd_help(tok_t arg[]);
+int cmd_pwd(tok_t arg[]);
+int cmd_cd(tok_t arg[]);
 
 /* Built-in command functions take token array (see parse.h) and return int */
 typedef int cmd_fun_t(tok_t args[]);
@@ -43,7 +48,31 @@ typedef struct fun_desc {
 fun_desc_t cmd_table[] = {
   {cmd_help, "?", "show this help menu"},
   {cmd_quit, "quit", "quit the command shell"},
+  {cmd_pwd, "pwd", "prints current working directory"},
+  {cmd_cd, "cd", "change to a new working directory"}
 };
+
+/** 
+  * Prints current working directory
+  */
+int cmd_pwd(tok_t arg[]) {
+  char cwdBuffer[1024];
+  if (getcwd(cwdBuffer, sizeof(cwdBuffer)) != NULL ) {
+    fprintf(stdout, "%s\n", cwdBuffer);
+  }
+  return 1;
+}
+
+/**
+  * Change to new working directory
+  */
+int cmd_cd(tok_t arg[]) {
+  // fprintf(stdout, "Trying to cd into: %s\n", arg[0]);
+  if (chdir(arg[0]) == -1) {
+    fprintf(stderr, "cd: %s: No such file or directory\n", arg[0]);
+  }
+  return 1;
+}
 
 /**
  * Prints a helpful description for the given command
@@ -92,7 +121,15 @@ void init_shell() {
     /* Take control of the terminal */
     tcsetpgrp(shell_terminal, shell_pgid);
     tcgetattr(shell_terminal, &shell_tmodes);
+
   }
+  // Ignore certain errors
+  signal (SIGCHLD, SIG_IGN);
+  signal (SIGINT, SIG_IGN);
+  signal (SIGQUIT, SIG_IGN);
+  signal (SIGTSTP, SIG_IGN);
+  signal (SIGTTIN, SIG_IGN);
+  signal (SIGTTOU, SIG_IGN);
 }
 
 int shell(int argc, char *argv[]) {
@@ -114,7 +151,95 @@ int shell(int argc, char *argv[]) {
       cmd_table[fundex].fun(&tokens[1]);
     } else {
       /* REPLACE this to run commands as programs. */
-      fprintf(stdout, "This shell doesn't know how to run programs.\n");
+
+      // fork child process
+      int pid = fork();
+
+      // check if process should be background
+      int tokenLen = 0;
+      bool inBackground = false;
+      while (tokens[tokenLen] != NULL ) {
+        tokenLen += 1;
+      }
+
+      if (tokenLen >= 2) {
+        if (strcmp("&",tokens[tokenLen -1]) == 0) {
+          inBackground = true;
+          // tokens[tokenLen - 1] = NULL;
+        }
+      }
+
+      //check if child process
+      if (pid == 0) {
+
+        // put child process on foreground
+        tcsetpgrp(shell_terminal , pid);
+
+        signal (SIGCHLD, SIG_DFL);
+        signal (SIGINT, SIG_DFL);
+        signal (SIGQUIT, SIG_DFL);
+        signal (SIGTSTP, SIG_DFL);
+        signal (SIGTTIN, SIG_DFL);
+        signal (SIGTTOU, SIG_DFL);
+
+        if (tokenLen > 2) {
+          if (strcmp(">",tokens[tokenLen - 2]) == 0) {
+            // do redirect
+            int openInt = open(tokens[tokenLen-1], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+            // if (openInt >= 0) {
+              dup2(openInt, 1);
+              close(openInt);
+              tokens[tokenLen -2] = NULL;
+            // }
+          } else if (strcmp("<",tokens[tokenLen - 2]) == 0) {
+            // do redirect
+            int openInt = open(tokens[tokenLen-1], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+            // if (openInt >= 0) {
+              dup2(openInt, 0);
+              close(openInt);
+              tokens[tokenLen -2] = NULL;            
+            // }
+          } 
+        }
+
+        if (inBackground) {
+          put_process_in_background(pid, true);
+          tokens[tokenLen - 1] = NULL;
+        } 
+
+        // try to execute command without path
+        if (execv(tokens[0],tokens) == -1) {
+
+          // search through path string for command resolution
+          char * pathString = getenv("PATH");
+          char * tokenPath = strtok(pathString, ":");
+          char path[1024];
+          while (tokenPath != NULL) {
+            strcpy(path,tokenPath);
+            strcat(path,"/");
+            strcat(path,tokens[0]);
+            if (execv(path,tokens) == -1) {
+              tokenPath = strtok(NULL, ":");
+            } else {
+              break;
+            }
+          }
+        }
+
+        // end of child process
+        return 1;
+
+      } else {
+        // parent process wait for child to finish
+        if (!inBackground) {
+          wait(&pid);
+        }
+        // waitpid(pid, &exitInfo , 0);
+        tcsetpgrp(shell_terminal, getpid());
+        // put_process_in_foreground(shell_terminal, getpid(), &shell_tmodes);
+      }
+
+      // fprintf(stdout, "This shell doesn't know how to run programs.\n");
     }
 
     if (shell_is_interactive)
@@ -124,3 +249,41 @@ int shell(int argc, char *argv[]) {
 
   return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
