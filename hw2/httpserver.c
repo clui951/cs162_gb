@@ -148,9 +148,9 @@ void handle_files_request(int fd) {
     size_t string_size = strlen(string);
     char str[256] = "";
     snprintf(str, sizeof(str), "%zu", string_size);
-    http_send_header(fd, "Content-length",  (char *)fsize); // content length wrong
+    http_send_header(fd, "Content-length", str); // content length wrong
     http_end_headers(fd);
-    http_send_data(fd, string, (size_t) fsize);
+    http_send_string(fd, string);
 
   } else {
     printf("NEITHER A DIR OR FILE \n");
