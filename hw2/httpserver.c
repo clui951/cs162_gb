@@ -160,7 +160,7 @@ void handle_files_request(int fd) {
     http_end_headers(fd);
     http_send_string(fd,
       "<center>"
-      "<h1>ERROR 404, NOT FOUND</h1>"
+      "<h1>ERROR 4040, NOT FOUND</h1>"
       "<hr>"
       "<p>This is a custom page</p>"
       "</center>");
