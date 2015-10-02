@@ -145,7 +145,7 @@ void handle_files_request(int fd) {
     string[fsize] = 0;
 
     // incorrect if string has null bytes
-    size_t string_size = strlen(string);
+    size_t string_size = rett;
     char str[256] = "";
     snprintf(str, sizeof(str), "%zu", string_size);
     http_send_header(fd, "Content-length", str); // content length wrong
