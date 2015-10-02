@@ -83,7 +83,7 @@ void handle_files_request(int fd) {
         strcat(retvalue, "<p>");
         ent = readdir(dir);
       }
-      printf("FINAL: %s\n", retvalue);
+      printf("FINAL retvalue: %s\n", retvalue);
       closedir (dir);
     }
 
@@ -92,6 +92,8 @@ void handle_files_request(int fd) {
     struct stat full_path_stat;
     stat(full_path, &full_path_stat);
     if (S_ISREG(full_path_stat.st_mode)) {
+      // found index.html
+      printf("%s\n", "FOUND INDEX.HTML IN HERE");
       // send back index.html
       http_start_response(fd,200);
       http_send_header(fd, "Content-type", "text/html");
@@ -103,7 +105,14 @@ void handle_files_request(int fd) {
       char *buffer = (char*) malloc(lSize+1 );
       fread( buffer , lSize, 1 , fp);
       fclose(fp);
-      http_send_header(fd, "Content-length", (char*) strlen(buffer));
+      printf("reached\n");
+      printf("%s\n", buffer);
+      // determine content-length
+      size_t buff_size = strlen(buffer);
+      char str[256] = "";
+      snprintf(str, sizeof(str), "%zu", buff_size);
+      printf("LENGTH IS: %s\n", str );
+      http_send_header(fd, "Content-length", str);
       // http_send_header(fd, "Content-length", "70");
       http_end_headers(fd);
       http_send_string(fd,buffer);
@@ -111,7 +120,10 @@ void handle_files_request(int fd) {
       // send back all files 
       http_start_response(fd,200);
       http_send_header(fd, "Content-type", "text/html");
-      http_send_header(fd, "Content-length", (char *) strlen(retvalue));
+      size_t ret_size = strlen(retvalue);
+      char str[256] = "";
+      snprintf(str, sizeof(str), "%zu", ret_size);
+      http_send_header(fd, "Content-length", str);
       http_end_headers(fd);
       http_send_string(fd,retvalue);
       printf("RETURN VALUE IS %s\n", retvalue);
