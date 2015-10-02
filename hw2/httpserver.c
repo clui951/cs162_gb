@@ -184,17 +184,54 @@ void handle_proxy_request(int fd) {
   struct hostent* host_hostent = gethostbyname(server_proxy_hostname);
   char * found_addr = host_hostent->h_addr;
 
-  struct sockaddr_in server_address;
-  memset(&server_address, 0, sizeof(server_address));
-  server_address.sin_family = AF_INET;
-  server_address.sin_addr.s_addr = INADDR_ANY;
-  server_address.sin_port = htons(server_proxy_port);
-
   int socket_number = socket(PF_INET, SOCK_STREAM, 0);
 
-  // connect(socket_number, (struct sockaddr *) &found_addr, sizeof(found_addr));
+  struct addrinfo lookup, *target;
+  memset(&lookup, 0 , sizeof(lookup));
+  lookup.ai_family = AF_UNSPEC;
+  lookup.ai_socktype = SOCK_STREAM;
+  getaddrinfo(server_proxy_hostname, "http", &lookup, &target);
 
-  
+  struct sockaddr_in sockaddr_addr = *((struct sockaddr_in*) target->ai_addr);
+  sockaddr_addr.sin_port = htons(server_proxy_port);
+  connect(fd, (struct sockaddr *) &sockaddr_addr, sizeof(sockaddr_addr));
+
+
+  fd_set fd1;
+  fd_set fd2;
+  FD_ZERO(&fd1);
+  FD_ZERO(&fd2);
+  FD_SET(socket_number, &fd1);
+  FD_SET(fd, &fd1);
+  char bufferr[9999];
+  while (true) {
+    fd2 = fd1;
+    int ret = select(FD_SETSIZE,&fd2,NULL,NULL,NULL);
+    if ( ret != 0 && FD_ISSET(socket_number, &fd2)) {
+      int ret1 = read(socket_number, bufferr , sizeof(bufferr));
+      if (ret1 > 0) {
+        ret1 = write(fd, bufferr, ret1);
+        if (ret1 > 0) {
+          break;
+        }
+      } else {
+        break;
+      }
+    } else if ( ret!= 0 && FD_ISSET(fd, &fd2)) {
+      int ret1 = read(fd, bufferr, sizeof(bufferr));
+      if (ret1 > 0) {
+        ret1 = write(socket_number, bufferr, ret1);
+        if (ret1 > 0) {
+          break;
+        }
+      } else {
+        break;
+      }
+    }
+  }
+  close(socket_number);
+
+  // connect(socket_number, (struct sockaddr *) server_adress, sizeof(found_addr));
 
 }
 
