@@ -111,7 +111,7 @@ void handle_files_request(int fd) {
       // send back all files 
       http_start_response(fd,200);
       http_send_header(fd, "Content-type", "text/html");
-      // http_send_header(fd, "Content-length", (char *) strlen(retvalue));
+      http_send_header(fd, "Content-length", (char *) strlen(retvalue));
       http_end_headers(fd);
       http_send_string(fd,retvalue);
       printf("RETURN VALUE IS %s\n", retvalue);
