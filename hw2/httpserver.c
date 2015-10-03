@@ -200,18 +200,18 @@ void handle_proxy_request(int fd) {
   connect(fd, (struct sockaddr *) &server_address, sizeof(server_address));
 
 
-  fd_set fd1;
-  fd_set fd2;
-  FD_ZERO(&fd1);
-  FD_ZERO(&fd2);
-  FD_SET(socket_number, &fd1);
-  FD_SET(fd, &fd1);
+  fd_set target;
+  fd_set source;
+  FD_ZERO(&target);
+  FD_ZERO(&source);
+  FD_SET(socket_number, &target);
+  FD_SET(fd, &source);
   char bufferr[9999];
   int run = 1;
   while (1) {
-    fd2 = fd1;
-    int ret = select(FD_SETSIZE,&fd2,NULL,NULL,NULL);
-    if ( ret != 0 && FD_ISSET(socket_number, &fd2)) {
+    source = target;
+    int ret = select(FD_SETSIZE,&source,NULL,NULL,NULL);
+    if ( ret != 0 && FD_ISSET(socket_number, &target)) {
       int ret1 = read(socket_number, bufferr , sizeof(bufferr));
       if (ret1 == -1) break;
       if (ret1 > 0) {
@@ -223,7 +223,7 @@ void handle_proxy_request(int fd) {
       } else {
         continue;
       }
-    } else if ( ret!= 0 && FD_ISSET(fd, &fd2)) {
+    } else if ( ret!= 0 && FD_ISSET(fd, &source)) {
       int ret1 = read(fd, bufferr, sizeof(bufferr));
       if (ret1 == -1) break;
       if (ret1 > 0) {
