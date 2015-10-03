@@ -186,15 +186,15 @@ void handle_proxy_request(int fd) {
 
   int socket_number = socket(PF_INET, SOCK_STREAM, 0);
 
-  struct addrinfo lookup, *target;
-  memset(&lookup, 0 , sizeof(lookup));
-  lookup.ai_family = AF_UNSPEC;
-  lookup.ai_socktype = SOCK_STREAM;
-  getaddrinfo(server_proxy_hostname, "http", &lookup, &target);
+  struct sockaddr_in server_address;
+  memset(&server_address, 0, sizeof(server_address));
+  server_address.sin_family = AF_INET;
+  struct in_addr inaddr;
+  inet_aton(found_addr, &inaddr);
+  server_address.sin_addr = inaddr;
+  server_address.sin_port = htons(server_proxy_port);
 
-  struct sockaddr_in sockaddr_addr = *((struct sockaddr_in*) target->ai_addr);
-  sockaddr_addr.sin_port = htons(server_proxy_port);
-  connect(fd, (struct sockaddr *) &sockaddr_addr, sizeof(sockaddr_addr));
+  connect(fd, (struct sockaddr *) &server_address, sizeof(server_address));
 
 
   fd_set fd1;
