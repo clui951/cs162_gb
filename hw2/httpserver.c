@@ -208,7 +208,7 @@ void handle_proxy_request(int fd) {
   FD_SET(fd, &fd1);
   char bufferr[9999];
   int run = 1;
-  while (run) {
+  while (1) {
     fd2 = fd1;
     int ret = select(FD_SETSIZE,&fd2,NULL,NULL,NULL);
     if ( ret != 0 && FD_ISSET(socket_number, &fd2)) {
