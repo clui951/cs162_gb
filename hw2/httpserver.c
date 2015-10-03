@@ -213,20 +213,22 @@ void handle_proxy_request(int fd) {
     int ret = select(FD_SETSIZE,&fd2,NULL,NULL,NULL);
     if ( ret != 0 && FD_ISSET(socket_number, &fd2)) {
       int ret1 = read(socket_number, bufferr , sizeof(bufferr));
+      if (ret1 == -1) break;
       if (ret1 > 0) {
         ret1 = write(fd, bufferr, ret1);
+        if (ret1 == -1) break;
         if (ret1 > 0) {
-          run = 0;
           continue;
-        }
+        } 
       } else {
-        run = 0;
         continue;
       }
     } else if ( ret!= 0 && FD_ISSET(fd, &fd2)) {
       int ret1 = read(fd, bufferr, sizeof(bufferr));
+      if (ret1 == -1) break;
       if (ret1 > 0) {
         ret1 = write(socket_number, bufferr, ret1);
+        if (ret1 == -1) break;
         if (ret1 > 0) {
           run = 0;
           continue;
