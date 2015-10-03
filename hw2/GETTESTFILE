@@ -1,0 +1,8 @@
+GET /hello.html HTTP/1.0\r\n
+Host: 127.0.0.1:8000\r\n
+Connection: keep-alive\r\n
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n
+User-Agent: Chrome/45.0.2454.93\r\n
+Accept-Encoding: gzip,deflate,sdch\r\n
+Accept-Language: en-US,en;q=0.8\r\n
+\r\n

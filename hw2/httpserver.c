@@ -178,6 +178,15 @@ void handle_files_request(int fd) {
  *   | client | <-> | httpserver | <-> | proxy target |
  *   +--------+     +------------+     +--------------+
  */
+
+// gdb httpserver
+// set follow-fork-mode child
+// break handle_proxy_request
+// run --proxy inst.eecs.berkeley.edu:80 --port 8000
+// 
+// ./httpserver --proxy inst.eecs.berkeley.edu:80 --port 8000
+// nc -v 192.168.162.162 8000 < GETTESTFILE
+
 void handle_proxy_request(int fd) {
 
   /* YOUR CODE HERE */
@@ -194,8 +203,11 @@ void handle_proxy_request(int fd) {
   memcpy( &server_address.sin_addr, found_addr, (size_t) length_addr);
   server_address.sin_port = htons(server_proxy_port);
 
-  connect(fd, (struct sockaddr *) &server_address, sizeof(server_address));
-
+  printf("CONNECTING\n");
+  int conn = connect(socket_number, (struct sockaddr *) &server_address, sizeof(server_address));
+  if (conn == -1) {
+    perror("connect failed"); // global variable with last error
+  }
 
   fd_set readd;
   fd_set action;
