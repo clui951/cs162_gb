@@ -206,7 +206,9 @@ void handle_proxy_request(int fd) {
   printf("CONNECTING\n");
   int conn = connect(socket_number, (struct sockaddr *) &server_address, sizeof(server_address));
   if (conn == -1) {
-    perror("connect failed"); // global variable with last error
+    perror("connect failed\n"); // global variable with last error
+  } else {
+    printf("CONNECTED\n");
   }
 
   fd_set readd;
