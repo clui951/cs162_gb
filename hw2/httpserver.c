@@ -200,42 +200,40 @@ void handle_proxy_request(int fd) {
   connect(fd, (struct sockaddr *) &server_address, sizeof(server_address));
 
 
-  fd_set target;
-  fd_set source;
-  FD_ZERO(&target);
-  FD_ZERO(&source);
-  FD_SET(socket_number, &target);
-  FD_SET(fd, &source);
+  fd_set readd;
+  fd_set action;
+  FD_ZERO(&readd);
+  FD_ZERO(&action);
+  FD_SET(socket_number, &action);
+  FD_SET(fd, &action);
   char bufferr[9999];
-  int run = 1;
+
   while (1) {
-    source = target;
-    int ret = select(FD_SETSIZE,&source,NULL,NULL,NULL);
-    if ( ret != 0 && FD_ISSET(socket_number, &target)) {
+    readd = action;
+    int ret = select(FD_SETSIZE,&readd,NULL,NULL,NULL);
+    if ( ret != 0 && FD_ISSET(socket_number, &readd)) {
       int ret1 = read(socket_number, bufferr , sizeof(bufferr));
-      if (ret1 == -1) break;
       if (ret1 > 0) {
         ret1 = write(fd, bufferr, ret1);
-        if (ret1 == -1) break;
         if (ret1 > 0) {
           continue;
-        } 
-      } else {
-        continue;
-      }
-    } else if ( ret!= 0 && FD_ISSET(fd, &source)) {
-      int ret1 = read(fd, bufferr, sizeof(bufferr));
-      if (ret1 == -1) break;
-      if (ret1 > 0) {
-        ret1 = write(socket_number, bufferr, ret1);
-        if (ret1 == -1) break;
-        if (ret1 > 0) {
-          run = 0;
-          continue;
+        } else {
+          break;
         }
       } else {
-        run = 0;
-        continue;
+        break;
+      }
+    } else if ( ret!= 0 && FD_ISSET(fd, &readd)) {
+      int ret1 = read(fd, bufferr, sizeof(bufferr));
+      if (ret1 > 0) {
+        ret1 = write(socket_number, bufferr, ret1);
+        if (ret1 > 0) {
+          continue;
+        } else {
+          break;
+        }
+      } else {
+        break;
       }
     }
   }
