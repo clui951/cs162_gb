@@ -192,7 +192,7 @@ void handle_proxy_request(int fd) {
   server_address.sin_family = AF_INET;
 
   struct in_addr inaddr;
-  memset(&inaddr, 0, sizeof(inaddr));
+  memset(&inaddr, 0, sizeof(struct in_addr));
   memcpy( &inaddr, found_addr, (size_t) length_addr);
   server_address.sin_addr = inaddr; // copy in specified number of bytes
   server_address.sin_port = htons(server_proxy_port);
