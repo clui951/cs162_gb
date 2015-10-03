@@ -183,15 +183,18 @@ void handle_proxy_request(int fd) {
   /* YOUR CODE HERE */
   struct hostent* host_hostent = gethostbyname(server_proxy_hostname);
   char * found_addr = host_hostent->h_addr;
+  int length_addr = host_hostent->h_length;
 
   int socket_number = socket(PF_INET, SOCK_STREAM, 0);
 
   struct sockaddr_in server_address;
   memset(&server_address, 0, sizeof(server_address));
   server_address.sin_family = AF_INET;
+
   struct in_addr inaddr;
-  inet_aton(found_addr, &inaddr);
-  server_address.sin_addr = inaddr;
+  memset(&inaddr, 0, sizeof(inaddr));
+  memcpy( &inaddr, found_addr, (size_t) length_addr);
+  server_address.sin_addr = inaddr; // copy in specified number of bytes
   server_address.sin_port = htons(server_proxy_port);
 
   connect(fd, (struct sockaddr *) &server_address, sizeof(server_address));
