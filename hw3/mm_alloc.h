@@ -21,7 +21,9 @@ struct s_block {
 };
 
 /* attempts to split a block, with size_t as first */
-void split_block(struct s_block *b, size_t s);
+// void split_block(struct s_block *b, size_t s);
+// void split_block_safe(struct s_block *b, size_t s);
+
 
 /* attempts to combine block with neighbors when free */
 struct s_block * combine_block(struct s_block *b);
