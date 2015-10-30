@@ -59,7 +59,7 @@ void *mm_malloc(size_t size) {
 			// struct s_block * entireblocknext = block->next;
 			// set_contents(block, block + sizeof(struct s_block) + size, block->prev, 0, size);
 			// set_contents(block + sizeof(struct s_block) + size, entireblocknext, block, 1, second_size);
-
+    		memset(block, 0, block->size);
     		block->free = 0;
     	}
     }
@@ -95,9 +95,12 @@ void *mm_realloc(void *ptr, size_t size) {
 
 void mm_free(void *ptr) {
     /* YOUR CODE HERE */
+    if (!ptr) {
+    	return;
+    }
     struct s_block *block = ((struct s_block *) ptr) - 1;
 	if (block) {
-		memset(block, 0 , block->size);
+		memset(block->data, 0 , block->size);
 		block->free = 1;
 		combine_block(block);
 	}
