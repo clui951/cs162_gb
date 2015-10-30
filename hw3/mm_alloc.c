@@ -90,7 +90,7 @@ void split_block_safe(struct s_block *b, size_t first_size) {
 	size_t entireSize = b->size;
 	size_t second_size = entireSize - first_size - sizeof(struct s_block);
 	struct s_block * entireblocknext = b->next;
-	struct s_block *second_block = b + sizeof(struct s_block) + first_size;
+	struct s_block *second_block = (struct s_block *) (b + sizeof(struct s_block) + first_size);
 	set_contents_safe(b, second_block, b->prev, 0, first_size);
 	memset(b->data, 0, first_size);
 
