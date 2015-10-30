@@ -63,7 +63,7 @@ void *mm_malloc(size_t size) {
 				// struct s_block * entireblocknext = block->next;
 				// set_contents(block, block + sizeof(struct s_block) + size, block->prev, 0, size);
 				// set_contents(block + sizeof(struct s_block) + size, entireblocknext, block, 1, second_size);
-
+    			split_block_safe(block, size);
 	    		memset(block->data, 0, block->size);
 	    		block->free = 0;
     		}

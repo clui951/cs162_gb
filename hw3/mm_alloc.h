@@ -92,18 +92,18 @@ struct s_block * extend_heap(struct s_block *prev_end, size_t s) {
 
 
 /* attempts to split a block, with size_t as first */
-// void split_block(struct s_block *b, size_t first_size) {
-// 	size_t entireSize = b->size;
-// 	size_t second_size = entireSize - first_size;
-// 	struct s_block * entireblocknext = b->next;
-// 	set_contents(b, b + sizeof(b) + first_size, b->prev, 0, first_size);
-// 	set_contents(b + sizeof(b) + first_size, entireblocknext, b, 1, second_size);
-// }
+void split_block(struct s_block *b, size_t first_size) {
+	size_t entireSize = b->size;
+	size_t second_size = entireSize - first_size;
+	struct s_block * entireblocknext = b->next;
+	set_contents(b, b + sizeof(b) + first_size, b->prev, 0, first_size);
+	set_contents(b + sizeof(b) + first_size, entireblocknext, b, 1, second_size);
+}
 
-// void split_block_safe(struct s_block *b, size_t first_size) {
-// 	size_t entireSize = b->size;
-// 	size_t second_size = entireSize - first_size;
-// 	struct s_block * entireblocknext = b->next;
-// 	set_contents_safe(b, b + sizeof(b) + first_size, b->prev, 0, first_size);
-// 	set_contents(b + sizeof(b) + first_size, entireblocknext, b, 1, second_size);
-// }
+void split_block_safe(struct s_block *b, size_t first_size) {
+	size_t entireSize = b->size;
+	size_t second_size = entireSize - first_size;
+	struct s_block * entireblocknext = b->next;
+	set_contents(b, b + sizeof(struct s_block) + first_size, b->prev, 0, first_size);
+	set_contents_safe(b + sizeof(struct s_block) + first_size, entireblocknext, b, 1, second_size);
+}
