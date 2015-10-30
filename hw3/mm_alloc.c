@@ -90,8 +90,15 @@ void *mm_realloc(void *ptr, size_t size) {
 		// struct s_block * entireblocknext = block->next;
 		// set_contents_safe(block, block + sizeof(struct s_block) + size, block->prev, 0, size);
 		// set_contents(block + sizeof(struct s_block) + size, entireblocknext, block, 1, second_size);
-
-		return block;
+		void *new_ptr = mm_malloc(size);
+		if (!new_ptr){
+			// split block
+			return block;
+		} else {
+			memcpy(new_ptr, ptr, block->size);
+			free(ptr);
+			return new_ptr;
+		}
 	}
 	void *new_ptr = mm_malloc(size);
 	if (!new_ptr){
