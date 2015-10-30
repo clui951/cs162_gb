@@ -100,12 +100,14 @@ void split_block_safe(struct s_block *b, size_t first_size) {
 // ===========================================================================
 void *mm_malloc(size_t size) {
     /* YOUR CODE HERE */
+    printf("entered mm_malloc\n");
     struct s_block * block;
     if (size <= 0 ) {
     	return NULL;
     }
     if (!global_base) {
     	// first time malloc
+    	printf("    first time mm_malloc\n");
 		block = extend_heap(NULL, size);
     	if (!block) {
     		return NULL;
@@ -116,6 +118,7 @@ void *mm_malloc(size_t size) {
     	struct s_block *last = (struct s_block *) global_base;
     	block = free_block_or_nah(&last, size);
     	if (!block) {
+    		printf("    need to extend_heap\n");
     		block = extend_heap(last, size);
     		if (!block) {
     			return NULL;
@@ -132,14 +135,15 @@ void *mm_malloc(size_t size) {
 				// struct s_block * entireblocknext = block->next;
 				// set_contents(block, block + sizeof(struct s_block) + size, block->prev, 0, size);
 				// set_contents(block + sizeof(struct s_block) + size, entireblocknext, block, 1, second_size);
-
-    			// split_block_safe(block, size);
+    			printf("    should split here\n");
+    			split_block_safe(block, size);
 	    		memset(block->data, 0, block->size);
+	    		printf("    %zu\n", block->size);
 	    		block->free = 0;
     		}
     	}
     }
-    return block+1;
+    return block->data;
 }
 
 void *mm_realloc(void *ptr, size_t size) {
@@ -177,6 +181,7 @@ void *mm_realloc(void *ptr, size_t size) {
 
 void mm_free(void *ptr) {
     /* YOUR CODE HERE */
+    printf("mm_free-ing, %p\n", ptr);
     if (!ptr) {
     	return;
     }
