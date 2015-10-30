@@ -58,11 +58,11 @@ void *mm_malloc(size_t size) {
     			memset(block, 0, block->size);
     			block->free = 0;
     		} else {
-    			size_t entireSize = block->size;
-				size_t second_size = entireSize - size;
-				struct s_block * entireblocknext = block->next;
-				set_contents(block, block + sizeof(struct s_block) + size, block->prev, 0, size);
-				set_contents(block + sizeof(struct s_block) + size, entireblocknext, block, 1, second_size);
+    			// size_t entireSize = block->size;
+				// size_t second_size = entireSize - size;
+				// struct s_block * entireblocknext = block->next;
+				// set_contents(block, block + sizeof(struct s_block) + size, block->prev, 0, size);
+				// set_contents(block + sizeof(struct s_block) + size, entireblocknext, block, 1, second_size);
 
 	    		memset(block, 0, block->size);
 	    		block->free = 0;
