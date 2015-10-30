@@ -19,9 +19,9 @@ int main(int argc, char **argv) {
     void * data1 = mm_malloc(20);
     printf("%p\n", data1);
     mm_free(data1);
-    void* data2 = mm_malloc(3);
+    void* data2 = mm_malloc(5);
     printf("%p\n", data2);
-    void* data3 = mm_malloc(4);
+    void* data3 = mm_malloc(5);
     printf("%p\n", data3);
 
     return 0;
