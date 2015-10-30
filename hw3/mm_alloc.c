@@ -73,10 +73,10 @@ void *mm_realloc(void *ptr, size_t size) {
 
 void mm_free(void *ptr) {
     /* YOUR CODE HERE */
-    struct s_block *block = (struct s_block *) ptr - sizeof(struct s_block);
-    size_t blocksize = block->size;
-    memset(block->data, 0, blocksize);
+    struct s_block *block = ((struct s_block *) ptr) - 1;
 	if (block) {
+		size_t blocksize = block->size;
+    	memset(block->data, 0, blocksize);
 		block->free = 1;
 		combine_block(block);
 	}
@@ -125,7 +125,7 @@ struct s_block * extend_heap(struct s_block *prev_end, size_t s) {
 	}
 	if (prev_end) {
 		prev_end->next = block;
-		block->prev = prev_end;
+		// block->prev = prev_end;
 	}
 	set_contents(block, NULL, prev_end, 0, s);
 
