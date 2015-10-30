@@ -125,7 +125,7 @@ struct s_block * extend_heap(struct s_block *prev_end, size_t s) {
 	}
 	if (prev_end) {
 		prev_end->next = block;
-		// block->prev = prev_end;
+		block->prev = prev_end;
 	}
 	set_contents(block, NULL, prev_end, 0, s);
 
