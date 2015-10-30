@@ -73,7 +73,7 @@ void *mm_realloc(void *ptr, size_t size) {
 
 void mm_free(void *ptr) {
     /* YOUR CODE HERE */
-    struct s_block *block = (struct s_block *) ptr - sizeof(s_block);
+    struct s_block *block = (struct s_block *) ptr - sizeof(struct s_block);
 	if (block) {
 		block->free = 1;
 		combine_block(block);
