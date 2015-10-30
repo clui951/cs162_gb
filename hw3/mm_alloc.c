@@ -193,7 +193,7 @@ void *mm_realloc(void *ptr, size_t size) {
 		} else {
 			memcpy(new_ptr, ptr, size);
 		}
-		free(ptr);
+		mm_free(ptr);
 		return new_ptr; 		// seg fault here???
 	}
 }
