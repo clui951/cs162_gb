@@ -79,11 +79,11 @@ void *mm_realloc(void *ptr, size_t size) {
 	}
 	if (block->size > size) {
 		// // split_block_safe(block, size);
-		// size_t entireSize = block->size;
-		// size_t second_size = entireSize - size;
-		// struct s_block * entireblocknext = block->next;
-		// set_contents_safe(block, block + sizeof(struct s_block) + size, block->prev, 0, size);
-		// set_contents(block + sizeof(struct s_block) + size, entireblocknext, block, 1, second_size);
+		size_t entireSize = block->size;
+		size_t second_size = entireSize - size;
+		struct s_block * entireblocknext = block->next;
+		set_contents_safe(block, block + sizeof(struct s_block) + size, block->prev, 0, size);
+		set_contents(block + sizeof(struct s_block) + size, entireblocknext, block, 1, second_size);
 
 		return block;
 	}
