@@ -94,12 +94,11 @@ void split_block_safe(struct s_block *b, size_t first_size) {
 	set_contents_safe(b, second_block, b->prev, 0, first_size);
 	memset(b->data, 0, first_size);
 
-	second_block->free = 1;
-	second_block->next = entireblocknext;
-	second_block->prev = b;
-	second_block->size = second_size;
 	if (second_block != NULL) {
-
+		second_block->free = 1;
+		second_block->next = entireblocknext;
+		second_block->prev = b;
+		second_block->size = second_size;
 	}
 
 	// set_contents_safe(b + sizeof(struct s_block) + first_size, entireblocknext, b, 1, second_size);
