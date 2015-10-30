@@ -54,12 +54,11 @@ void *mm_malloc(size_t size) {
     	} else {
     		// need to split check
 
-			size_t entireSize = block->size;
-			size_t second_size = entireSize - size;
-			struct s_block * entireblocknext = block->next;
-			set_contents(block, block + sizeof(struct s_block) + size, block->prev, 0, size);
-			set_contents(block + sizeof(struct s_block) + size, entireblocknext, block, 1, second_size);
-			
+			// size_t entireSize = block->size;
+			// size_t second_size = entireSize - size;
+			// struct s_block * entireblocknext = block->next;
+			// set_contents(block, block + sizeof(struct s_block) + size, block->prev, 0, size);
+			// set_contents(block + sizeof(struct s_block) + size, entireblocknext, block, 1, second_size);
     		memset(block, 0, block->size);
     		block->free = 0;
     	}
@@ -74,7 +73,11 @@ void *mm_realloc(void *ptr, size_t size) {
 		return mm_malloc(size);
 	}
 	struct s_block * block = ((struct s_block *) ptr) - 1;
-	if (block->size >= size) {
+	if (block->size == size) {
+		//dont need to split
+		return block;
+	}
+	if (block->size > size) {
 		// // split_block_safe(block, size);
 		// size_t entireSize = block->size;
 		// size_t second_size = entireSize - size;
