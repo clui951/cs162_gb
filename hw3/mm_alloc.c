@@ -93,12 +93,12 @@ void split_block_safe(struct s_block *b, size_t first_size) {
 	struct s_block *second_block = (struct s_block *) (b + sizeof(struct s_block) + first_size);
 	set_contents_safe(b, second_block, b->prev, 0, first_size);
 	memset(b->data, 0, first_size);
-	printf("\nblock being split: %p\n", b);
-	printf("entireSize: %zu\n", entireSize);
-	printf("first block size: %zu\n", first_size);
-	printf("second block: %p\n", second_block);
-	printf("second block size: %zu\n", second_size);
-	printf("sizeof(struct s_block): %zu\n\n", sizeof(struct s_block));
+	// printf("\nblock being split: %p\n", b);
+	// printf("entireSize: %zu\n", entireSize);
+	// printf("first block size: %zu\n", first_size);
+	// printf("second block: %p\n", second_block);
+	// printf("second block size: %zu\n", second_size);
+	// printf("sizeof(struct s_block): %zu\n\n", sizeof(struct s_block));
 	if (second_block != NULL) {
 		second_block->free = 1; 		// GETTING SEG FAULTS ON THIS LINE
 		second_block->next = entireblocknext;
@@ -139,7 +139,7 @@ void *mm_malloc(size_t size) {
     			return NULL;
     		}
     	} else {
-    		if (block->size <= size + sizeof(struct s_block)) {
+    		if (block->size < size + sizeof(struct s_block) + 4) {
     			memset(block->data, 0, block->size);
     			block->free = 0;
     		} else {
