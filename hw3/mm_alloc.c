@@ -4,7 +4,7 @@
  * Stub implementations of the mm_* routines.
  */
 
-#include "mm_alloc.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -25,6 +25,75 @@ struct s_block * free_block_or_nah(struct s_block **last, size_t size) {
 	}
 	return curr;
 }
+
+void set_contents(struct s_block *b, struct s_block *next, struct s_block *prev, int free, size_t s) {
+	b->next = next;
+	b->prev = prev;
+	b->free = free;
+	b->size = s;
+	memset(b->data, 0, s);
+}
+
+void set_contents_safe(struct s_block *b, struct s_block *next, struct s_block *prev, int free, size_t s) {
+	b->next = next;
+	b->prev = prev;
+	b->free = free;
+	b->size = s;
+}
+
+
+struct s_block * combine_block(struct s_block *b) {
+	size_t size_just_freed = b->size;
+	if (b->next) {
+		if (b->next->free == 1) {
+			size_t size_in_front = b->next->size;
+			set_contents_safe(b, b->next->next, b->prev, 1, size_just_freed + size_in_front);
+		}
+	}
+	if (b->prev) {
+		if (b->prev->free == 1) {
+			set_contents_safe(b->prev, b->next, b->prev->prev, 1, b->prev->size + b->size);
+			return b->prev;
+		}
+	}
+	return b;
+}
+
+
+/* add to heap */
+struct s_block * extend_heap(struct s_block *prev_end, size_t s) {
+	struct s_block *block = (struct s_block *) sbrk(0);
+	void *request = sbrk(sizeof(struct s_block) + s);
+	if (request == (void *) -1) {
+		return NULL;
+	}
+	if (prev_end) {
+		prev_end->next = block;
+		// block->prev = prev_end;
+	}
+	set_contents(block, NULL, prev_end, 0, s);
+
+	return block;
+}
+
+
+/* attempts to split a block, with size_t as first */
+void split_block(struct s_block *b, size_t first_size) {
+	size_t entireSize = b->size;
+	size_t second_size = entireSize - first_size;
+	struct s_block * entireblocknext = b->next;
+	set_contents(b, b + sizeof(b) + first_size, b->prev, 0, first_size);
+	set_contents(b + sizeof(b) + first_size, entireblocknext, b, 1, second_size);
+}
+
+void split_block_safe(struct s_block *b, size_t first_size) {
+	size_t entireSize = b->size;
+	size_t second_size = entireSize - first_size;
+	struct s_block * entireblocknext = b->next;
+	set_contents(b, b + sizeof(struct s_block) + first_size, b->prev, 0, first_size);
+	set_contents_safe(b + sizeof(struct s_block) + first_size, entireblocknext, b, 1, second_size);
+}
+
 
 // ===========================================================================
 // ===========================================================================
@@ -52,18 +121,18 @@ void *mm_malloc(size_t size) {
     			return NULL;
     		}
     	} else {
-    		// need to split check
-
     		if (block->size == size) {
     			memset(block->data, 0, block->size);
     			block->free = 0;
     		} else {
+    			// need to split block
+
     			// size_t entireSize = block->size;
 				// size_t second_size = entireSize - size;
 				// struct s_block * entireblocknext = block->next;
 				// set_contents(block, block + sizeof(struct s_block) + size, block->prev, 0, size);
 				// set_contents(block + sizeof(struct s_block) + size, entireblocknext, block, 1, second_size);
-				
+
     			// split_block_safe(block, size);
 	    		memset(block->data, 0, block->size);
 	    		block->free = 0;
@@ -85,12 +154,7 @@ void *mm_realloc(void *ptr, size_t size) {
 		return block;
 	}
 	if (block->size > size) {
-		// // split_block_safe(block, size);
-		// size_t entireSize = block->size;
-		// size_t second_size = entireSize - size;
-		// struct s_block * entireblocknext = block->next;
-		// set_contents_safe(block, block + sizeof(struct s_block) + size, block->prev, 0, size);
-		// set_contents(block + sizeof(struct s_block) + size, entireblocknext, block, 1, second_size);
+		// need to check split
 		void *new_ptr = mm_malloc(size);
 		if (!new_ptr){
 			// split block
