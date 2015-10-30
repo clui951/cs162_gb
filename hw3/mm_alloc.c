@@ -116,11 +116,11 @@ void mm_free(void *ptr) {
     	return;
     }
     struct s_block *block = ((struct s_block *) ptr) - 1;
-	if (block) {
-		memset(block->data, 0 , block->size);
-		block->free = 1;
-		combine_block(block);
-	}
+	// if (block) {
+	// memset(block->data, 0 , block->size);
+	block->free = 1;
+	combine_block(block);
+	// }
 }
 
 // ===========================================================================

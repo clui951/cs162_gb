@@ -61,12 +61,12 @@ struct s_block * combine_block(struct s_block *b) {
 	if (b->next) {
 		if (b->next->free == 1) {
 			size_t size_in_front = b->next->size;
-			set_contents(b, b->next->next, b->prev, 1, size_just_freed + size_in_front);
+			set_contents_safe(b, b->next->next, b->prev, 1, size_just_freed + size_in_front);
 		}
 	}
 	if (b->prev) {
 		if (b->prev->free == 1) {
-			set_contents(b->prev, b->next, b->prev->prev, 1, b->prev->size + b->size);
+			set_contents_safe(b->prev, b->next, b->prev->prev, 1, b->prev->size + b->size);
 			return b->prev;
 		}
 	}
