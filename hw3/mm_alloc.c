@@ -75,8 +75,6 @@ void mm_free(void *ptr) {
     /* YOUR CODE HERE */
     struct s_block *block = ((struct s_block *) ptr) - 1;
 	if (block) {
-		size_t blocksize = block->size;
-    	memset(block->data, 0, blocksize);
 		block->free = 1;
 		combine_block(block);
 	}
