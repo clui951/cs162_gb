@@ -136,7 +136,7 @@ void *mm_malloc(size_t size) {
 				// set_contents(block, block + sizeof(struct s_block) + size, block->prev, 0, size);
 				// set_contents(block + sizeof(struct s_block) + size, entireblocknext, block, 1, second_size);
     			printf("    should split here\n");
-    			split_block_safe(block, size);
+    			// split_block_safe(block, size);
 	    		memset(block->data, 0, block->size);
 	    		printf("    %zu\n", block->size);
 	    		block->free = 0;
