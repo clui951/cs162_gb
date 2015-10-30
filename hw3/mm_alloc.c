@@ -52,7 +52,7 @@ struct s_block * combine_block(struct s_block *b) {
 	}
 	if (b->prev) {
 		if (b->prev->free == 1) {
-			set_contents_safe(b->prev, b->next, b->prev->prev, 1, b->prev->size + b->size);
+			set_contents_safe(b->prev, b->next, b->prev->prev, 1, b->prev->size + sizeof(struct s_block) + b->size);
 			return b->prev;
 		}
 	}
@@ -95,7 +95,7 @@ void split_block_safe(struct s_block *b, size_t first_size) {
 	memset(b->data, 0, first_size);
 
 	if (second_block != NULL) {
-		second_block->free = 1;
+		second_block->free = 1; 		// GETTING SEG FAULTS ON THIS LINE
 		second_block->next = entireblocknext;
 		second_block->prev = b;
 		second_block->size = second_size;
@@ -156,6 +156,9 @@ void *mm_realloc(void *ptr, size_t size) {
 	if (!ptr) {
 		return mm_malloc(size);
 	}
+	if (size == 0) {
+		return NULL;
+	}
 	struct s_block * block = ((struct s_block *) ptr) - 1;
 	// if (block->size == size) {
 	// 	//dont need to split
@@ -178,6 +181,7 @@ void *mm_realloc(void *ptr, size_t size) {
 		return NULL;
 	} else {
 		if (block->size < size) {
+			memset(new_ptr, 0, size);
 			memcpy(new_ptr, ptr, block->size);
 		} else {
 			memcpy(new_ptr, ptr, size);
