@@ -144,19 +144,24 @@ void kvserver_handle_tpc(kvserver_t *server, kvrequest_t *req, kvresponse_t *res
     alloc_msg(res->body, "commit");
 
   } else if (req_type == COMMIT) {
-    if (server->pending_msg == PUTREQ) {
+    if (server->pending_msg == EMPTY) {
+
+    } else if (server->pending_msg == PUTREQ) {
       kvserver_put(server, server->pending_key, server->pending_value);
       server->pending_key = NULL;
       server->pending_value = NULL;
+      server->pending_msg = EMPTY;
     } else if (server->pending_msg == DELREQ) {
       kvserver_del(server, server->pending_key);
       server->pending_key = NULL;
       server->pending_value = NULL;
+      server->pending_msg = EMPTY;
     }
     res->type = ACK;
   } else if (req_type == ABORT) {
     server->pending_key = NULL;       
     server->pending_value = NULL; 
+    server->pending_msg = EMPTY;
     res->type = ACK;
 
   } else {
