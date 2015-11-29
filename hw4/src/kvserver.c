@@ -166,7 +166,7 @@ void kvserver_handle_tpc(kvserver_t *server, kvrequest_t *req, kvresponse_t *res
 
   } else {
     res->type = ERROR;
-    alloc_msg(res->body, ERRMSG_NOT_IMPLEMENTED);
+    alloc_msg(res->body, ERRMSG_END_OF_HANDLE_TPC);
   }
 }
 
