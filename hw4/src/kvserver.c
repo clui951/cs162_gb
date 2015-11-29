@@ -124,8 +124,45 @@ int kvserver_del(kvserver_t *server, char *key) {
  */
 void kvserver_handle_tpc(kvserver_t *server, kvrequest_t *req, kvresponse_t *res) {
   /* TODO: Implement me! */
-  res->type = ERROR;
-  alloc_msg(res->body, ERRMSG_NOT_IMPLEMENTED);
+
+  msgtype_t req_type = req->type;
+  char *req_key = req->key;
+  char *req_val = req->val;
+
+  if (req_type == PUTREQ) {
+    server->pending_msg = PUTREQ;       // set server state 
+    server->pending_key = req_key;      // set key in question
+    server->pending_value = req_val;    // set value in question
+    res->type = VOTE;                   // send a vote for commit
+    alloc_msg(res->body, "commit");
+
+  } else if (req_type == DELREQ) {
+    server->pending_msg = DELREQ;       // set server state 
+    server->pending_key = req_key;      // set key in question
+    server->pending_value = NULL;       // no value in question
+    res->type = VOTE;                   // send a vote for commit
+    alloc_msg(res->body, "commit");
+
+  } else if (req_type == COMMIT) {
+    if (server->pending_msg == PUTREQ) {
+      kvserver_put(server, server->pending_key, server->pending_value);
+      server->pending_key = NULL;
+      server->pending_value = NULL;
+    } else if (server->pending_msg == DELREQ) {
+      kvserver_del(server, server->pending_key);
+      server->pending_key = NULL;
+      server->pending_value = NULL;
+    }
+    res->type = ACK;
+  } else if (req_type == ABORT) {
+    server->pending_key = NULL;       
+    server->pending_value = NULL; 
+    res->type = ACK;
+
+  } else {
+    res->type = ERROR;
+    alloc_msg(res->body, ERRMSG_NOT_IMPLEMENTED);
+  }
 }
 
 /* Generic entrypoint for this SERVER. Takes in a socket on SOCKFD, which
