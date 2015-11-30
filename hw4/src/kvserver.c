@@ -179,7 +179,7 @@ void kvserver_handle_tpc(kvserver_t *server, kvrequest_t *req, kvresponse_t *res
       // res->body = *value;
     } else {
       res->type = ERROR;
-      alloc_msg(res->body, ERRNOKEY);
+      alloc_msg(res->body, ERRMSG_NO_KEY);
     }
   } else {
     res->type = ERROR;
