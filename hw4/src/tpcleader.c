@@ -181,6 +181,8 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
     return;
   }
   /* TODO: Implement me! */
+  fprintf(stderr, "%s\n", "\n---- ENTERED tpcleader_handle_tpc ----");
+  fprintf(stderr, "%d\n", req->type);
 
   char *req_key = req->key;
   int r_val = leader->redundancy;
@@ -190,6 +192,7 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
 
   // PHASE 1
   while (r_val > 0) {
+    fprintf(stderr, "%s\n", "\nPHASE 1 ENTERED WHILE LOOP");
     r_val = r_val - 1;
     sockfd = connect_to(curr_follower->host, curr_follower->port, 2);
     if (sockfd != -1) {
@@ -209,19 +212,29 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
     close(sockfd);
   }
 
+  fprintf(stderr, "%s\n", "\nEXITED WHILE LOOP");
   r_val = leader->redundancy;
   curr_follower = tpcleader_get_primary(leader, req_key);
   // PHASE 2
+  if (abortBool > 0) {
+    req->type = ABORT;
+  } else {
+    req->type = COMMIT;
+  }
+
   while (r_val > 0) {
+    fprintf(stderr, "%s\n", "\nPHASE 2 ENTERED OUTER WHILE LOOP");
     r_val = r_val - 1;
     int acked = 0;
     while (acked == 0) {
+      fprintf(stderr, "%s\n", "PHASE 2 ENTERED INNER WHILE LOOP");
       sockfd = connect_to(curr_follower->host, curr_follower->port, 2);
       if (sockfd != -1) {
         kvrequest_send(req, sockfd);
         kvresponse_t *follower_response = kvresponse_recieve(sockfd);
         if (follower_response != NULL) {
-          if (follower_response->type == ACK) {
+          if (follower_response->type == ACK) {     // THIS IS NEVER ENTERED
+            fprintf(stderr, "%s\n", "MURHURHURHUR: ACKED");
             acked = 1;
           }
         }
