@@ -138,8 +138,18 @@ tpcfollower_t *tpcleader_get_successor(tpcleader_t *leader,
  */
 void tpcleader_handle_get(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *res) {
   /* TODO: Implement me! */
-  res->type = ERROR;
-  alloc_msg(res->body, ERRMSG_NOT_IMPLEMENTED);
+  char *req_key = req->key;
+  tpcfollower_t *primary_follower = tpcleader_get_primary(leader, req_key);
+  int socketfd = connect_to(primary_follower->host, primary_follower->port, 5);
+  int req_send = kvrequest_send(req, socketfd);
+  if (socketfd == -1 || req_send == -1) {
+    primary_follower = primary_follower->next;
+    socketfd = connect_to(primary_follower->host, primary_follower->port, 5);
+    req_send = kvrequest_send(req, socketfd);
+  }
+  kvresponse_t *response = kvresponse_recieve(socketfd);
+  res->type = GETRESP;
+  res->body = response->body;
 }
 
 /* Handles an incoming TPC request REQ, and populates RES as a response.
