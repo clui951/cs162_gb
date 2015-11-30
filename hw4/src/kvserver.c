@@ -164,6 +164,13 @@ void kvserver_handle_tpc(kvserver_t *server, kvrequest_t *req, kvresponse_t *res
     server->pending_msg = EMPTY;
     res->type = ACK;
 
+  } else if (req_type == GETREQ) {
+    char **value = NULL;
+    int get_resp = kvserver_get(server, req_key, value);
+    if (get_resp == 0) {    // success
+      res->type = GETRESP;
+      res->body = *value;
+    }
   } else {
     res->type = ERROR;
     alloc_msg(res->body, ERRMSG_END_OF_HANDLE_TPC);
