@@ -144,7 +144,7 @@ void tpcleader_handle_get(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
 
   int flag = 0;
   while (r_val > 0) {
-    int socketfd = connect_to(curr_follower->host, curr_follower->port, 5);
+    int socketfd = connect_to(curr_follower->host, curr_follower->port, 2);
     int req_send = kvrequest_send(req, socketfd);
     if (socketfd == -1 || req_send == -1) {       // CONNECTION FAILED!!!
       curr_follower = curr_follower->next;
@@ -181,8 +181,55 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
     return;
   }
   /* TODO: Implement me! */
-  res->type = ERROR;
-  alloc_msg(res->body, ERRMSG_NOT_IMPLEMENTED);
+
+  char *req_key = req->key;
+  int r_val = leader->redundancy;
+  tpcfollower_t *curr_follower = tpcleader_get_primary(leader, req_key);
+  int sockfd;
+  int abortBool = 0;
+
+  // PHASE 1
+  while (r_val > 0) {
+    r_val = r_val - 1;
+    sockfd = connect_to(curr_follower->host, curr_follower->port, 2);
+    if (sockfd != -1) {
+      kvrequest_send(req, sockfd);
+      kvresponse_t *follower_response = kvresponse_recieve(sockfd);
+      if (follower_response == NULL) {  // TIMEOUT
+        abortBool = abortBool + 1;      
+      }
+      char *votebody = follower_response->body;
+      if (!strcmp(votebody, "commit")) {
+        abortBool = abortBool + 1;
+      }
+    } else {
+      abortBool = abortBool + 1;
+    }
+    curr_follower = curr_follower->next;
+    close(sockfd);
+  }
+
+  r_val = leader->redundancy;
+  curr_follower = tpcleader_get_primary(leader, req_key);
+  // PHASE 2
+  while (r_val > 0) {
+    r_val = r_val - 1;
+    int acked = 0;
+    while (acked == 0) {
+      sockfd = connect_to(curr_follower->host, curr_follower->port, 2);
+      if (sockfd != -1) {
+        kvrequest_send(req, sockfd);
+        kvresponse_t *follower_response = kvresponse_recieve(sockfd);
+        if (follower_response != NULL) {
+          if (follower_response->type == ACK) {
+            acked = 1;
+          }
+        }
+      }
+      close(sockfd);
+    }
+    curr_follower = curr_follower->next;
+  }
 }
 
 
