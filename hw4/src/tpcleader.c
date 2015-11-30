@@ -139,17 +139,31 @@ tpcfollower_t *tpcleader_get_successor(tpcleader_t *leader,
 void tpcleader_handle_get(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *res) {
   /* TODO: Implement me! */
   char *req_key = req->key;
-  tpcfollower_t *primary_follower = tpcleader_get_primary(leader, req_key);
-  int socketfd = connect_to(primary_follower->host, primary_follower->port, 5);
-  int req_send = kvrequest_send(req, socketfd);
-  // if (socketfd == -1 || req_send == -1) {
-  //   primary_follower = primary_follower->next;
-  //   socketfd = connect_to(primary_follower->host, primary_follower->port, 5);
-  //   req_send = kvrequest_send(req, socketfd);
-  // }
-  kvresponse_t *response = kvresponse_recieve(socketfd);
-  res->type = GETRESP;
-  res->body = response->body;
+  int r_val = leader->redundancy;
+  tpcfollower_t *curr_follower = tpcleader_get_primary(leader, req_key);
+
+  int flag = 0;
+  while (r_val > 0) {
+    int socketfd = connect_to(curr_follower->host, curr_follower->port, 5);
+    int req_send = kvrequest_send(req, socketfd);
+    if (socketfd == -1 || req_send == -1) {       // CONNECTION FAILED!!!
+      curr_follower = curr_follower->next;
+    } else {
+      kvresponse_t *response = kvresponse_recieve(socketfd);
+      if (response == NULL) {
+        curr_follower = curr_follower->next;
+      }
+      flag = 1;     // FOUND A VAL TO RETURN!!!
+      res->type = GETRESP;
+      alloc_msg(res->body, response->body);
+      break;
+    }
+    r_val = r_val - 1;
+  }
+  if (flag == 0) {
+    res->type = ERROR;
+    alloc_msg(res->body, ERRMSG_NO_KEY);
+  }
 }
 
 /* Handles an incoming TPC request REQ, and populates RES as a response.
