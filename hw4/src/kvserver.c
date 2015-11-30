@@ -139,12 +139,17 @@ void kvserver_handle_tpc(kvserver_t *server, kvrequest_t *req, kvresponse_t *res
     alloc_msg(res->body, "commit");
 
   } else if (req_type == DELREQ) {
-    kvserver_del_check(server, req_key);
-    server->pending_msg = DELREQ;       // set server state 
-    alloc_msg(server->pending_key, req_key);      // set key in question
-    server->pending_value = NULL;       // no value in question
-    res->type = VOTE;                   // send a vote for commit
-    alloc_msg(res->body, "commit");
+    int del_resp = kvserver_del_check(server, req_key);
+    if (del_resp == 0) {
+      server->pending_msg = DELREQ;       // set server state 
+      alloc_msg(server->pending_key, req_key);      // set key in question
+      server->pending_value = NULL;       // no value in question
+      res->type = VOTE;                   // send a vote for commit
+      alloc_msg(res->body, "commit");
+    } else {
+      res->type = ERROR;
+      alloc_msg(res->body, ERRMSG_INVALID_REQUEST);
+    }
 
   } else if (req_type == COMMIT) {
     if (server->pending_msg == EMPTY) {
