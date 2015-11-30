@@ -171,7 +171,8 @@ void kvserver_handle_tpc(kvserver_t *server, kvrequest_t *req, kvresponse_t *res
     int get_resp = kvserver_get(server, req_key, value);
     if (get_resp == 0) {    // success
       res->type = GETRESP;
-      res->body = *value;
+      alloc_msg(res->body, *value);
+      // res->body = *value;
     }
   } else {
     res->type = ERROR;
