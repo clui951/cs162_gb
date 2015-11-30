@@ -130,17 +130,18 @@ void kvserver_handle_tpc(kvserver_t *server, kvrequest_t *req, kvresponse_t *res
   char *req_val = req->val;
 
   if (req_type == PUTREQ) {
+    // fprintf(stderr, "TRYING SET UP PUTREQ: %s\n", req_key);
     kvserver_put_check(server, req_key, req_val);
     server->pending_msg = PUTREQ;       // set server state 
-    server->pending_key = req_key;      // set key in question
-    server->pending_value = req_val;    // set value in question
+    alloc_msg(server->pending_key, req_key);      // set key in question
+    alloc_msg(server->pending_value, req_val);// set value in question
     res->type = VOTE;                   // send a vote for commit
     alloc_msg(res->body, "commit");
 
   } else if (req_type == DELREQ) {
     kvserver_del_check(server, req_key);
     server->pending_msg = DELREQ;       // set server state 
-    server->pending_key = req_key;      // set key in question
+    alloc_msg(server->pending_key, req_key);      // set key in question
     server->pending_value = NULL;       // no value in question
     res->type = VOTE;                   // send a vote for commit
     alloc_msg(res->body, "commit");
@@ -149,7 +150,9 @@ void kvserver_handle_tpc(kvserver_t *server, kvrequest_t *req, kvresponse_t *res
     if (server->pending_msg == EMPTY) {
 
     } else if (server->pending_msg == PUTREQ) {
-      kvserver_put(server, server->pending_key, server->pending_value);
+      // fprintf(stderr, "TRYING KVSERVER_PUT: %s\n", server->pending_key);
+      int resp_code = kvserver_put(server, server->pending_key, server->pending_value);
+      // fprintf(stderr, "HERE IS THE KVSERVER_PUT RESPONSE CODE: %d\n", resp_code);
       server->pending_key = NULL;
       server->pending_value = NULL;
       server->pending_msg = EMPTY;
@@ -167,12 +170,16 @@ void kvserver_handle_tpc(kvserver_t *server, kvrequest_t *req, kvresponse_t *res
     res->type = ACK;
 
   } else if (req_type == GETREQ) {
-    char **value = NULL;
-    int get_resp = kvserver_get(server, req_key, value);
+    char *value = NULL;
+    int get_resp = kvserver_get(server, req_key, &value);  // returning non-0, meaning failed
+    // fprintf(stderr, "HERE IS THE KVSERVER_GET RESPONSE CODE: %d\n", get_resp);
     if (get_resp == 0) {    // success
       res->type = GETRESP;
-      alloc_msg(res->body, *value);
+      alloc_msg(res->body, value);
       // res->body = *value;
+    } else {
+      res->type = ERROR;
+      alloc_msg(res->body, ERRMSG_CUSTOM);
     }
   } else {
     res->type = ERROR;

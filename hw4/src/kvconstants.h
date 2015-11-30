@@ -47,6 +47,7 @@
 #define ERRMSG_FOLLOWER_CAPACITY "error: follower capacity already full"
 #define ERRMSG_GENERIC_ERROR "error: unable to process request"
 #define ERRMSG_END_OF_HANDLE_TPC "error: end of kserver_handle_tpc"
+#define ERRMSG_CUSTOM "error: Calvin's Custom Error"
 
 /* Paths for API endpoints. */
 #define COMMIT_PATH MSG_COMMIT
