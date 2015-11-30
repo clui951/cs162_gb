@@ -200,13 +200,17 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
       kvresponse_t *follower_response = kvresponse_recieve(sockfd);
       if (follower_response == NULL) {  // TIMEOUT
         abortBool = abortBool + 1;      
-      }
-      char *votebody = follower_response->body;
-      if (!strcmp(votebody, "commit")) {
-        abortBool = abortBool + 1;
+        break;
+      } else {
+        char *votebody = follower_response->body;
+        if (!strcmp(votebody, "commit")) {
+          abortBool = abortBool + 1;
+          break;
+        }
       }
     } else {
       abortBool = abortBool + 1;
+      break;
     }
     curr_follower = curr_follower->next;
     close(sockfd);
@@ -243,6 +247,7 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
     }
     curr_follower = curr_follower->next;
   }
+  res->type = SUCCESS;
 }
 
 
