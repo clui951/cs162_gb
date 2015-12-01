@@ -153,11 +153,13 @@ void tpcleader_handle_get(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
       if (response == NULL || response->type != GETRESP) {
         curr_follower = curr_follower->next;
       }
-      flag = 1;     // FOUND A VAL TO RETURN!!!
-      res->type = GETRESP;
-      alloc_msg(res->body, response->body);
-      close(socketfd);
-      break;
+      if (response->type == GETRESP) {
+        flag = 1;     // FOUND A VAL TO RETURN!!!
+        res->type = GETRESP;
+        alloc_msg(res->body, response->body);
+        close(socketfd);
+        break;
+      }
     }
     close(socketfd);
     r_val = r_val - 1;
