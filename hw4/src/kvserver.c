@@ -156,7 +156,7 @@ void kvserver_handle_tpc(kvserver_t *server, kvrequest_t *req, kvresponse_t *res
 
     } else if (server->pending_msg == PUTREQ) {
       // fprintf(stderr, "TRYING KVSERVER_PUT: %s\n", server->pending_key);
-      int resp_code = kvserver_put(server, server->pending_key, server->pending_value);
+      kvserver_put(server, server->pending_key, server->pending_value);
       // fprintf(stderr, "HERE IS THE KVSERVER_PUT RESPONSE CODE: %d\n", resp_code);
       server->pending_key = NULL;
       server->pending_value = NULL;
