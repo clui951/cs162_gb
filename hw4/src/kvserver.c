@@ -161,6 +161,7 @@ void kvserver_handle_tpc(kvserver_t *server, kvrequest_t *req, kvresponse_t *res
     if (server->pending_msg == EMPTY) {
 
     } else if (server->pending_msg == PUTREQ) {
+      printf("PUTTING IN kvserver_handle_tpc\n");
       kvserver_put(server, server->pending_key, server->pending_value);
       server->pending_key = NULL;
       server->pending_value = NULL;

@@ -221,8 +221,10 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
 
   if (abortBool > 0) {
     req->type = ABORT;
+    printf("ABORT\n");
   } else {
     req->type = COMMIT;
+    printf("COMMIT\n");
   }
   
   // PHASE 2
@@ -231,8 +233,11 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
     int acked = 0;
     int counter = 0;
     while (acked == 0) {
-      sleep(1);
+      usleep(100);
       counter = counter + 1;
+      if (counter % 5000 == 0) {
+        sleep(1);
+      }
       sockfd = connect_to(curr_follower->host, curr_follower->port, 1);
       if (sockfd != -1) {
         kvrequest_send(req, sockfd);
@@ -242,11 +247,12 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
             printf("Phase 2: ACKED\n");
             acked = 1;
           }
-        } 
-      } else {
-        if (counter % 5000 == 0) {
-          printf("connect_to failed\n");
         }
+        // close(sockfd); 
+      } else {
+        // if (counter % 5000 == 0) {
+        //   printf("connect_to failed: %s %d  on sockfd: %d\n", curr_follower->host, curr_follower->port, sockfd);
+        // }
       }
       close(sockfd);
     }
