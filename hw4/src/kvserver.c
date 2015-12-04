@@ -126,10 +126,10 @@ void kvserver_handle_tpc(kvserver_t *server, kvrequest_t *req, kvresponse_t *res
   /* TODO: Implement me! */
 
   // log immediately
-  // tpclog_t logg = server->log;
-  // if (req->type != GETREQ) {      // only log put/del/comm/abort; comm/abort will be cleared after
-  //   tpclog_log(&logg, req->type, req->key, req->val);  
-  // }
+  tpclog_t logg = server->log;
+  if (req->type != GETREQ) {      // only log put/del/comm/abort; comm/abort will be cleared after
+    tpclog_log(&logg, req->type, req->key, req->val);  
+  }
 
   msgtype_t req_type = req->type;
   char *req_key = req->key;
@@ -291,13 +291,13 @@ int kvserver_rebuild_state(kvserver_t *server) {
         server->pending_key = NULL;
         server->pending_value = NULL;
         server->pending_msg = EMPTY;
-        tpclog_clear_log(&logg);
+        // tpclog_clear_log(&logg);
       }
     } else if (log_ent->type == ABORT) {
       server->pending_key = NULL;       
       server->pending_value = NULL; 
       server->pending_msg = EMPTY;
-      tpclog_clear_log(&logg);
+      // tpclog_clear_log(&logg);
     }
   }
 
