@@ -184,9 +184,6 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
     alloc_msg(res->body, ERRMSG_NOT_AT_CAPACITY);
     return;
   }
-  /* TODO: Implement me! */
-  // fprintf(stderr, "%s\n", "\n---- ENTERED tpcleader_handle_tpc ----");
-  // fprintf(stderr, "%d\n", req->type);
 
   char *req_key = req->key;
   int r_val = leader->redundancy;
@@ -196,52 +193,47 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
 
   // PHASE 1
   while (r_val > 0) {
-    // fprintf(stderr, "%s\n", "\nPHASE 1 ENTERED WHILE LOOP");
     r_val = r_val - 1;
     sockfd = connect_to(curr_follower->host, curr_follower->port, 2);
     if (sockfd != -1) {
       kvrequest_send(req, sockfd);
       kvresponse_t *follower_response = kvresponse_recieve(sockfd);
-      if (follower_response == NULL || follower_response->type != VOTE) {  // TIMEOUT
+      if (follower_response == NULL || follower_response->type != VOTE) {  
         abortBool = abortBool + 1;      
         break;
       } else {
         char *votebody = follower_response->body;
         if (strcmp(votebody, MSG_COMMIT) != 0) {
           abortBool = abortBool + 1;
-          break;
         }
       }
     } else {
       abortBool = abortBool + 1;
-      break;
     }
-    // curr_follower = curr_follower->next;
     curr_follower = tpcleader_get_successor(leader, curr_follower);
     close(sockfd);
   }
-
-  // fprintf(stderr, "%s\n", "\nEXITED WHILE LOOP");
+  // END PHASE 1
   r_val = leader->redundancy;
   curr_follower = tpcleader_get_primary(leader, req_key);
-  // PHASE 2
+
   if (abortBool > 0) {
     req->type = ABORT;
   } else {
     req->type = COMMIT;
   }
-
+  
+  // PHASE 2
   while (r_val > 0) {
     r_val = r_val - 1;
     int acked = 0;
     while (acked == 0) {
-      // fprintf(stderr, "%s\n", "PHASE 2 ENTERED INNER WHILE LOOP");
       sockfd = connect_to(curr_follower->host, curr_follower->port, 2);
       if (sockfd != -1) {
         kvrequest_send(req, sockfd);
         kvresponse_t *follower_response = kvresponse_recieve(sockfd);
         if (follower_response != NULL) {
-          if (follower_response->type == ACK) {     // THIS IS NEVER ENTERED
+          if (follower_response->type == ACK) {    
             acked = 1;
           }
         }
@@ -250,9 +242,15 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
     }
     // curr_follower = curr_follower->next;
     curr_follower = tpcleader_get_successor(leader, curr_follower);
-
   }
-  res->type = SUCCESS;
+  // END PHASE 2
+  
+  if (abortBool > 0) {
+    res->type = ERROR;
+    alloc_msg(res->body, ERRMSG_GENERIC_ERROR);
+  } else {
+    res->type = SUCCESS;
+  }
 }
 
 
