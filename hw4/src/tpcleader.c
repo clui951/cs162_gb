@@ -234,7 +234,7 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
     int counter = 0;
     while (acked == 0) {
       // sleep(1);           // will pass tolerance, but other tests time out
-      usleep(300000);
+      usleep(200000);
       // counter = counter + 1;
       // if (counter % 5000 == 0) {
       //   sleep(1);
