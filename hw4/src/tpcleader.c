@@ -194,7 +194,7 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
   // PHASE 1
   while (r_val > 0) {
     r_val = r_val - 1;
-    sockfd = connect_to(curr_follower->host, curr_follower->port, 2);
+    sockfd = connect_to(curr_follower->host, curr_follower->port, 1);
     if (sockfd != -1) {
       kvrequest_send(req, sockfd);
       kvresponse_t *follower_response = kvresponse_recieve(sockfd);
@@ -227,7 +227,8 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
     r_val = r_val - 1;
     int acked = 0;
     while (acked == 0) {
-      sockfd = connect_to(curr_follower->host, curr_follower->port, 2);
+      sleep(1);
+      sockfd = connect_to(curr_follower->host, curr_follower->port, 1);
       if (sockfd != -1) {
         kvrequest_send(req, sockfd);
         kvresponse_t *follower_response = kvresponse_recieve(sockfd);
