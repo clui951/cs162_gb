@@ -231,11 +231,11 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
       if (sockfd != -1) {
         kvrequest_send(req, sockfd);
         kvresponse_t *follower_response = kvresponse_recieve(sockfd);
-        if (follower_response != NULL) {
-          if (follower_response->type == ACK) {    
-            acked = 1;
-          }
-        }
+        // if (follower_response != NULL) {
+          // if (follower_response->type == ACK) {    
+        acked = 1;
+          // }
+        // }
       }
       close(sockfd);
     }
