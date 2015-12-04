@@ -204,9 +204,12 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
         char *votebody = follower_response->body;
         if (strcmp(votebody, MSG_COMMIT) != 0) {
           abortBool = abortBool + 1;
+        } else {
+          printf("Phase 1: commit received\n");
         }
       }
     } else {
+      printf("Phase 1: no connect\n");
       abortBool = abortBool + 1;
     }
     curr_follower = tpcleader_get_successor(leader, curr_follower);
@@ -226,17 +229,24 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
   while (r_val > 0) {
     r_val = r_val - 1;
     int acked = 0;
+    int counter = 0;
     while (acked == 0) {
       sleep(1);
+      counter = counter + 1;
       sockfd = connect_to(curr_follower->host, curr_follower->port, 1);
       if (sockfd != -1) {
         kvrequest_send(req, sockfd);
         kvresponse_t *follower_response = kvresponse_recieve(sockfd);
-        // if (follower_response != NULL) {
-          // if (follower_response->type == ACK) {    
-        acked = 1;
-          // }
-        // }
+        if (follower_response != NULL) {
+          if (follower_response->type == ACK) {    
+            printf("Phase 2: ACKED\n");
+            acked = 1;
+          }
+        } 
+      } else {
+        if (counter % 5000 == 0) {
+          printf("connect_to failed\n");
+        }
       }
       close(sockfd);
     }
