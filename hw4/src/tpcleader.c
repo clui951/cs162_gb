@@ -200,7 +200,6 @@ void tpcleader_handle_tpc(tpcleader_t *leader, kvrequest_t *req, kvresponse_t *r
       kvresponse_t *follower_response = kvresponse_recieve(sockfd);
       if (follower_response == NULL || follower_response->type != VOTE) {  
         abortBool = abortBool + 1;      
-        break;
       } else {
         char *votebody = follower_response->body;
         if (strcmp(votebody, MSG_COMMIT) != 0) {
