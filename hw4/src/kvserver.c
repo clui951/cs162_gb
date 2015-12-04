@@ -297,7 +297,7 @@ int kvserver_rebuild_state(kvserver_t *server) {
     tpclog_clear_log(&logg);
   }
 
-  return 0;
+  return -1;
 }
 
 /* Deletes all current entries in SERVER's store and removes the store
