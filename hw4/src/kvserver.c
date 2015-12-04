@@ -172,13 +172,13 @@ void kvserver_handle_tpc(kvserver_t *server, kvrequest_t *req, kvresponse_t *res
       server->pending_msg = EMPTY;
     }
     res->type = ACK;
-    // tpclog_clear_log(&logg);         // remove all log because committed stuff don't need to be kept
+    tpclog_clear_log(&logg);         // remove all log because committed stuff don't need to be kept
   } else if (req_type == ABORT) {
     server->pending_key = NULL;       
     server->pending_value = NULL; 
     server->pending_msg = EMPTY;
     res->type = ACK;
-    // tpclog_clear_log(&logg);         // remove all log becaues aborted stuff don't need to be kept
+    tpclog_clear_log(&logg);         // remove all log becaues aborted stuff don't need to be kept
   } else if (req_type == GETREQ) {
     char *value = NULL;
     int get_resp = kvserver_get(server, req_key, &value);  
@@ -291,13 +291,13 @@ int kvserver_rebuild_state(kvserver_t *server) {
         server->pending_key = NULL;
         server->pending_value = NULL;
         server->pending_msg = EMPTY;
-        // tpclog_clear_log(&logg);
+        tpclog_clear_log(&logg);
       }
     } else if (log_ent->type == ABORT) {
       server->pending_key = NULL;       
       server->pending_value = NULL; 
       server->pending_msg = EMPTY;
-      // tpclog_clear_log(&logg);
+      tpclog_clear_log(&logg);
     }
   }
 
