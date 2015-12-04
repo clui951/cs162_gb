@@ -234,68 +234,72 @@ void kvserver_handle(kvserver_t *server, int sockfd, void *extra) {
  */
 int kvserver_rebuild_state(kvserver_t *server) {
   /* TODO: Implement me! */
-  // tpclog_t logg = server->log;
-  // tpclog_iterate_begin(&logg);
+  tpclog_t logg = server->log;
+  tpclog_iterate_begin(&logg);
 
-  // logentry_t *log_ent;
-  // while (tpclog_iterate_has_next(&logg)) {
-  //   log_ent = tpclog_iterate_next(&logg);
-  // }
+  logentry_t *log_ent;
+  int flag = 0;
+  while (tpclog_iterate_has_next(&logg)) {
+    log_ent = tpclog_iterate_next(&logg);
+    flag = 1;
+  }
 
-  // msgtype_t logtype = log_ent->type;
+  if (flag == 1) {
+    msgtype_t logtype = log_ent->type;
 
-  // if (logtype == PUTREQ) {
+    if (logtype == PUTREQ) {
 
-  //   // get the key and value
-  //   char *logkey = log_ent->data;
-  //   char *logvalue = logkey;
-  //   while (*(logvalue++) != '\0') { }
-  //   // int len1 = logvalue - logkey;
-  //   // int len2 = log_ent->length - len1;
+      // get the key and value
+      char *logkey = log_ent->data;
+      char *logvalue = logkey;
+      while (*(logvalue++) != '\0') { }
+      // int len1 = logvalue - logkey;
+      // int len2 = log_ent->length - len1;
 
-  //   // char *key;
-  //   // char *value;
-  //   // strcpy(key, logkey);
-  //   // strcpy(value, logvalue);
+      // char *key;
+      // char *value;
+      // strcpy(key, logkey);
+      // strcpy(value, logvalue);
 
-  //   kvserver_put_check(server, logkey, logvalue);
-  //   server->pending_msg = PUTREQ;
-  //   alloc_msg(server->pending_key, logkey);      // set key in question
-  //   alloc_msg(server->pending_value, logvalue);// set value in question
-  
-  // } else if (log_ent->type == DELREQ) {
-
-  //   // char *logkey = log_ent->data;
-  //   // char *key;
-  //   // strcpy(key, logkey, log_ent->length);
-
-  //   kvserver_del_check(server, log_ent->data);
-  //   server->pending_msg = DELREQ;       // set server state 
-  //   strcpy(server->pending_key, log_ent->data);
-  //   // alloc_msg(server->pending_key, key);      // set key in question
-  //   server->pending_value = NULL;       // no value in question
+      kvserver_put_check(server, logkey, logvalue);
+      server->pending_msg = PUTREQ;
+      alloc_msg(server->pending_key, logkey);      // set key in question
+      alloc_msg(server->pending_value, logvalue);// set value in question
     
-  // } else if (log_ent->type == COMMIT) {
-  //   if (server->pending_msg == EMPTY) {
+    } else if (log_ent->type == DELREQ) {
 
-  //   } else if (server->pending_msg == PUTREQ) {
-  //     kvserver_put(server, server->pending_key, server->pending_value);
-  //     server->pending_key = NULL;
-  //     server->pending_value = NULL;
-  //     server->pending_msg = EMPTY;
-  //   } else if (server->pending_msg == DELREQ) {
-  //     kvserver_del(server, server->pending_key);
-  //     server->pending_key = NULL;
-  //     server->pending_value = NULL;
-  //     server->pending_msg = EMPTY;
-  //     tpclog_clear_log(&logg);
-  //   }
-  // } else if (log_ent->type == ABORT) {
-  //   server->pending_key = NULL;       
-  //   server->pending_value = NULL; 
-  //   server->pending_msg = EMPTY;
-  //   tpclog_clear_log(&logg);
-  // }
+      // char *logkey = log_ent->data;
+      // char *key;
+      // strcpy(key, logkey, log_ent->length);
+
+      kvserver_del_check(server, log_ent->data);
+      server->pending_msg = DELREQ;       // set server state 
+      strcpy(server->pending_key, log_ent->data);
+      // alloc_msg(server->pending_key, key);      // set key in question
+      server->pending_value = NULL;       // no value in question
+      
+    } else if (log_ent->type == COMMIT) {
+      if (server->pending_msg == EMPTY) {
+
+      } else if (server->pending_msg == PUTREQ) {
+        kvserver_put(server, server->pending_key, server->pending_value);
+        server->pending_key = NULL;
+        server->pending_value = NULL;
+        server->pending_msg = EMPTY;
+      } else if (server->pending_msg == DELREQ) {
+        kvserver_del(server, server->pending_key);
+        server->pending_key = NULL;
+        server->pending_value = NULL;
+        server->pending_msg = EMPTY;
+        tpclog_clear_log(&logg);
+      }
+    } else if (log_ent->type == ABORT) {
+      server->pending_key = NULL;       
+      server->pending_value = NULL; 
+      server->pending_msg = EMPTY;
+      tpclog_clear_log(&logg);
+    }
+  }
 
   return -1;
 }
